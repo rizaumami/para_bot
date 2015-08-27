@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TOKEN='102512650:AAEUTgAuPp0zRoBtDzOO-RkYZLDPW2IXRF4'
+TOKEN=''
 URL='https://api.telegram.org/bot'$TOKEN
 MSG_URL=$URL'/sendMessage?chat_id='
 UPD_URL=$URL'/getUpdates?offset='
@@ -19,19 +19,10 @@ while true; do {
 	OFFSET=$(echo $res | ./libs/JSON.sh | egrep '\["result",0,"update_id"\]' | cut -f 2)
 	MESSAGE=$(echo $res | ./libs/JSON.sh -s | egrep '\["result",0,"message","text"\]' | cut -f 2 | cut -d '"' -f 2)
 
-  #TARGET=$(echo $res | jq -r '.result[0].message.chat.id')
-	#OFFSET=$(echo $res | jq -r '.result[0].update_id')
-	#MESSAGE=$(echo $res | jq -r '.result[0].message.text')
-
   MESSAGE=${MESSAGE}
   COMMAND="${MESSAGE%% *}"
   
 	OFFSET=$((OFFSET+1))
-
-  echo $res
-  echo $TARGET
-  echo $OFFSET
-  echo $MESSAGE 
   
 	if [ $OFFSET != 1 ]; then
 		case $COMMAND in
