@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# para_bot, the Telegram bot written in bash.
+# Written by si_kabayan
+# Inspired by http://github.com/topkecleon/bashbot
+
+# Depends on JSON.sh (http://github.com/dominictarr/JSON.sh),
+# which is MIT/Apache-licensed.
+
+# variables --------------------------------------------------------------------
+
 TOKEN=''
 URL='https://api.telegram.org/bot'$TOKEN
 MSG_URL=$URL'/sendMessage?chat_id='
@@ -7,9 +16,13 @@ UPD_URL=$URL'/getUpdates?offset='
 OFFSET=0
 TIMEOUT='timeout=20'
 
+# functions --------------------------------------------------------------------
+
 function send_message {
 	res=$(curl --data-urlencode "text=$2" "$MSG_URL$1&")
 }
+
+# main -------------------------------------------------------------------------
 
 while true; do {
 
@@ -56,4 +69,4 @@ while true; do {
 	fi
 
 } ; done
-#} &>/dev/null; done
+} &>/dev/null; done
