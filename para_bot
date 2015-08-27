@@ -19,6 +19,7 @@ TIMEOUT='timeout=20'
 # functions --------------------------------------------------------------------
 
 function send_message {
+  curl --data-urlencode "action=typing" "$URL/sendChatAction?chat_id=$1&"
 	res=$(curl --data-urlencode "text=$2" "$MSG_URL$1&")
 }
 
@@ -74,5 +75,4 @@ while true; do {
 		send_message "$TARGET" "$msg"
 	fi
 
-} ; done
 } &>/dev/null; done
