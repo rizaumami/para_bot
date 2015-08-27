@@ -20,7 +20,7 @@ TIMEOUT='timeout=20'
 
 function send_message {
   curl --data-urlencode "action=typing" "$URL/sendChatAction?chat_id=$1&"
-	res=$(curl --data-urlencode "text=$2" "$MSG_URL$1&")
+  res=$(curl --data-urlencode "text=$2" "$MSG_URL$1&reply_to_message_id=$3&disable_web_page_preview=1&")
 }
 
 # main -------------------------------------------------------------------------
@@ -32,33 +32,39 @@ while true; do {
 	TARGET=$(echo $res | ./libs/JSON.sh | egrep '\["result",0,"message","chat","id"\]' | cut -f 2)
 	OFFSET=$(echo $res | ./libs/JSON.sh | egrep '\["result",0,"update_id"\]' | cut -f 2)
 	MESSAGE=$(echo $res | ./libs/JSON.sh -s | egrep '\["result",0,"message","text"\]' | cut -f 2 | cut -d '"' -f 2)
+  MSG_ID=$(echo $res | ./libs/JSON.sh | egrep '\["result",0,"message","message_id"\]' | cut -f 2)
 
-  MESSAGE=${MESSAGE}
+  MESSAGE=${MESSAGE/@para_bot/}
   COMMAND="${MESSAGE%% *}"
   
 	OFFSET=$((OFFSET+1))
   
 	if [ $OFFSET != 1 ]; then
 		case $COMMAND in
-			'/info')  msg="This is para_bot, the Telegram bot written in bash.";;
+			'/info')
+        msg="This is para_bot, the Telegram bot written in bash."
+      ;;
       '/calc')  
         msg="$(printf "%.2f\n" $(echo ${MESSAGE} | \
-        sed 's|/calc ||;s|libs  LICENSE  para_bot  para_bot.sh  plugins  README.md|*|' | bc -l))"
+        sed 's|/calc ||;s|libs  LICENSE  para_bot  plugins  README.md|*|' | bc -l))"
       ;;
       '/ddg')
         QUERY="$(echo ${MESSAGE/\/ddg /} | sed 's|[!]|%21|g;s| |+|g')"
         msg="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$QUERY&kp=1\
         &format=json&kp=1&no_redirect=1&no_html=1" | \
         sed -e 's|.*Redirect":"\(.*\)","DefinitionURL.*|\1|')";;
-      '/echo')  msg="${MESSAGE/\/echo /}";;
+      '/echo')
+        msg="${MESSAGE/\/echo /}"
+      ;;
       '/help')  
-        msg="echo 'Available commands:
+        msg="Available commands:
         - /about
-        - /help [command]
-        - /info
         - /calc <expression>
         - /ddg <query>
-        - /echo <text>'"
+        - /echo <text>
+        - /help [command]
+        - /info
+        - /jam"
       ;;
       '/jam') 
         H=$(date +%H)
@@ -71,8 +77,9 @@ while true; do {
         msg="$(sed -n -e /^"$QUERY\t"/Ip ./libs/kbbi.txt | \
         sed -e "s|[\]n|\n|g;s|^$QUERY.*\t||I")"
       ;;
+      *) echo "Not defined";;
 		esac
-		send_message "$TARGET" "$msg"
+		send_message "$TARGET" "$msg" "$MSG_ID"
 	fi
 
 } &>/dev/null; done
