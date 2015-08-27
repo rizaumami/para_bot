@@ -42,7 +42,7 @@ while true; do {
 			'/info')  msg="This is para_bot, the Telegram bot written in bash.";;
       '/calc')  
         msg="$(printf "%.2f\n" $(echo ${MESSAGE} | \
-        sed 's|/calc ||;s|libs plugins|*|' | bc -l))"
+        sed 's|/calc ||;s|libs  LICENSE  para_bot  para_bot.sh  plugins  README.md|*|' | bc -l))"
       ;;
       '/ddg')
         QUERY="$(echo ${MESSAGE/\/ddg /} | sed 's|[!]|%21|g;s| |+|g')"
@@ -58,6 +58,12 @@ while true; do {
         - /calc <expression>
         - /ddg <query>
         - /echo <text>'"
+      ;;
+      '/jam') 
+        H=$(date +%H)
+        MS=$(date +%M:%S)
+        msg=$(printf "%s\n" "UTC : $(date -u +%T)" "WIB : $H:$MS" \
+        "WIT: $(($H+1)):$MS" "WITA: $(($H+2)):$MS")
       ;;
       '/kamus')  
         QUERY="${MESSAGE/\/kamus /}"
