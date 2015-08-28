@@ -9,7 +9,7 @@
 
 # variables --------------------------------------------------------------------
 
-TOKEN='102512650:AAEUTgAuPp0zRoBtDzOO-RkYZLDPW2IXRF4'
+TOKEN=''
 URL='https://api.telegram.org/bot'$TOKEN
 MSG_URL=$URL'/sendMessage?chat_id='
 UPD_URL=$URL'/getUpdates?offset='
