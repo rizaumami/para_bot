@@ -2,84 +2,102 @@
 
 # para_bot, the Telegram bot written in bash.
 # Written by si_kabayan
-# Inspired by http://github.com/topkecleon/bashbot
-
-# Depends on JSON.sh (http://github.com/dominictarr/JSON.sh),
-# which is MIT/Apache-licensed.
 
 # variables --------------------------------------------------------------------
 
-TOKEN=''
-URL='https://api.telegram.org/bot'$TOKEN
-MSG_URL=$URL'/sendMessage?chat_id='
-UPD_URL=$URL'/getUpdates?offset='
-OFFSET=0
-TIMEOUT='timeout=20'
+token=''
+url='https://api.telegram.org/bot'$token
+send_massage=$url'/sendMessage?chat_id='
+get_updates=$url'/getUpdates?offset='
+offset=0
+timeout='timeout=20'
 bot_start=$(date +%s)
 
 # functions --------------------------------------------------------------------
 
 function send_message {
-  curl --data-urlencode "action=typing" "$URL/sendChatAction?chat_id=$1&"
+  curl --data-urlencode "action=typing" "$url/sendChatAction?chat_id=$1&"
   res=$(curl --data-urlencode "text=$2" \
-  "$MSG_URL$1&reply_to_message_id=$3&disable_web_page_preview=1&")
+  "$send_massage$1&reply_to_message_id=$3&disable_web_page_preview=1&")
 }
 
 # main -------------------------------------------------------------------------
 
 while true; do {
 
-	res=$(curl $UPD_URL$OFFSET$TIMEOUT)
-  
-	TARGET=$(echo $res | ./libs/JSON.sh -b\
-  | egrep '\["result",0,"message","chat","id"\]' | cut -f 2)
-	OFFSET=$(echo $res | ./libs/JSON.sh -b\
-  | egrep '\["result",0,"update_id"\]' | cut -f 2)
-	MESSAGE=$(echo $res | ./libs/JSON.sh -b -s \
-  | egrep '\["result",0,"message","text"\]' | cut -f 2 | cut -d '"' -f 2)
-  message_id=$(echo $res | ./libs/JSON.sh \
-  | egrep '\["result",0,"message","message_id"\]' | cut -f 2)
-  unix_date=$(echo $res | ./libs/JSON.sh -b \
-  | egrep '\["result",0,"message","date"\]' | cut -f 2)
-  
-  MESSAGE=${MESSAGE/@para_bot/}
-  COMMAND="${MESSAGE%% *}"
-  
-	OFFSET=$((OFFSET+1))
-    
-	if [[ $unix_date > $(($bot_start-1)) ]]; then
-    case $COMMAND in
+  set -f
+
+  res=$(curl $get_updates$offset$timeout)
+
+  if [[ ${#res} > 23 ]]
+  then
+    chat_id=${res##*id\":}
+    chat_id=${chat_id%%,*}
+    offset=${res#*id\":}
+    offset=${offset%%,*}
+    message=${res#*\\}
+    message=${message%%\"*}
+    message=${message/\\/}
+    message_id=${res#*message_id\":}
+    message_id=${message_id%%,*}
+    unix_date=${res##*date\":}
+    unix_date=${unix_date%%,*}
+  else
+    chat_id=
+    offset=
+    message=
+    message_id=
+    unix_date=
+  fi
+
+  message=${message/@para_bot/}
+
+	offset=$((offset+1))
+
+  if [[ $unix_date > $(($bot_start-1)) ]] && [[ $offset != 1 ]] \
+  && [[ $chat_id = -18812428 ]] || [[ $chat_id = -15387310 ]]
+  then
+    case "${message%% *}" in
       '/info')
         msg="This is para_bot, the Telegram bot written in bash."
       ;;
       '/calc')
-        msg="$(printf "%.2f\n" ${MESSAGE:6} \
-        | sed 's|/calc ||;s|libs  LICENSE  para_bot  plugins  README.md|*|' \
-        | bc -l))"
+        if [[ ${message:6} = *[!\ ]* ]]
+        then
+          expression="$(printf "%s\n" "${message:6}" | bc -l 2>&1)"
+          is_error=${expression//[![:alpha:]]}
+          if [[ ${#is_error} > 3 ]]
+          then
+            msg="$expression"
+          else
+            msg="$(printf "%s\n" ${expression%%.*}.${expression:(-20):2})"
+          fi
+        elsemsg=$(printf "%s\n" "/calc <expression>" \
+          "Calculator powered by bc, an arbitrary precision calculator language.")
+        fi
       ;;
       '/ddg')
-        QUERY=${MESSAGE:5}
-        QUERY=${QUERY/\!/\%21}
-        QUERY=${QUERY// /+}
-        if [[ $QUERY = *[!\ ]* ]]; then
-          msg="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$QUERY&kp=1\
+        query=${message:5}
+        query=${query/\!/\%21}
+        query=${query// /+}
+        if [[ $query = *[!\ ]* ]]; then
+          msg="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$query&kp=1\
         &format=json&kp=1&no_redirect=1&no_html=1" \
-        | sed -e 's|.*Redirect":"\(.*\)","DefinitionURL.*|\1|')"
+        | sed -e 's|.*Redirect":"\(.*\)","Definitionurl.*|\1|')"
         else
           msg=$(printf "%s\n" "/ddg <query>" \
-          "This command performs a DuckDuckGo search for the given query.")
+          "This command performs a DuckDuckGo instant search for the given query.")
         fi
       ;;
       '/echo')
-        gsm="${MESSAGE:6}"
-        [[ -n $gsm ]] && echo "ADA"
+        gsm="${message:6}"
         if [[ $gsm = *[!\ ]* ]]; then
-          msg=$gsm
+          msg="$gsm"
         else
           msg=$(printf "%s\n" "/echo <text>" "Repeat a string.")
         fi
       ;;
-      '/help')  
+      '/help')
         msg="Available commands:
         - /about
         - /calc <expression>
@@ -89,26 +107,32 @@ while true; do {
         - /info
         - /jam"
       ;;
-      '/jam') 
+      '/jam')
         H=$(date +%H)
         MS=$(date +%M:%S)
         msg=$(printf "%s\n" "UTC : $(date -u +%T)" "WIB : $H:$MS" \
         "WIT: $(($H+1)):$MS" "WITA: $(($H+2)):$MS")
       ;;
-      '/kamus')  
-        QUERY="${MESSAGE:7}"
-        WORD="$(sed -n -e /^"$QUERY\t"/Ip ./libs/kbbi.txt \
-        | sed -e "s|[\]n|\n|g;s|^$QUERY.*\t||I")"
-        
-        if [[ -n $WORD ]]; then
-          msg=$WORD
+      '/kamus')
+        query="${message:7}"
+        if [[ $query = *[!\ ]* ]]
+        then
+          definition="$(sed -n -e /^"$query\t"/Ip ./libs/kbbi.txt \
+          | sed -e "s|[\]n|\n|g;s|^$query.*\t||I")"
+
+          if [[ -n $definition ]]; then
+            msg=$definition
+          else
+            msg="Maaf, kata yang dicari tidak ada dalam KBBI Edisi III (2005)"
+          fi
         else
-          msg="Maaf, kata yang dicari tidak ada dalam KBBI Edisi III (2005)"
+          msg=$(printf "%s\n" "/kamus <term>" \
+          "Kamus Besar Bahasa Indonesia, Edisi III (2005).")
         fi
       ;;
       *) msg="";;
 		esac
-		send_message "$TARGET" "$msg" "$message_id"
+		send_message "$chat_id" "$msg" "$message_id"
 	fi
 
 } &>/dev/null; done
