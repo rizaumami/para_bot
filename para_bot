@@ -9,18 +9,20 @@
 
 # variables --------------------------------------------------------------------
 
-TOKEN=''
+TOKEN='102512650:AAEUTgAuPp0zRoBtDzOO-RkYZLDPW2IXRF4'
 URL='https://api.telegram.org/bot'$TOKEN
 MSG_URL=$URL'/sendMessage?chat_id='
 UPD_URL=$URL'/getUpdates?offset='
 OFFSET=0
 TIMEOUT='timeout=20'
+bot_start=$(date +%s)
 
 # functions --------------------------------------------------------------------
 
 function send_message {
   curl --data-urlencode "action=typing" "$URL/sendChatAction?chat_id=$1&"
-  res=$(curl --data-urlencode "text=$2" "$MSG_URL$1&reply_to_message_id=$3&disable_web_page_preview=1&")
+  res=$(curl --data-urlencode "text=$2" \
+  "$MSG_URL$1&reply_to_message_id=$3&disable_web_page_preview=1&")
 }
 
 # main -------------------------------------------------------------------------
@@ -28,33 +30,54 @@ function send_message {
 while true; do {
 
 	res=$(curl $UPD_URL$OFFSET$TIMEOUT)
-
-	TARGET=$(echo $res | ./libs/JSON.sh | egrep '\["result",0,"message","chat","id"\]' | cut -f 2)
-	OFFSET=$(echo $res | ./libs/JSON.sh | egrep '\["result",0,"update_id"\]' | cut -f 2)
-	MESSAGE=$(echo $res | ./libs/JSON.sh -s | egrep '\["result",0,"message","text"\]' | cut -f 2 | cut -d '"' -f 2)
-  MSG_ID=$(echo $res | ./libs/JSON.sh | egrep '\["result",0,"message","message_id"\]' | cut -f 2)
-
+  
+	TARGET=$(echo $res | ./libs/JSON.sh -b\
+  | egrep '\["result",0,"message","chat","id"\]' | cut -f 2)
+	OFFSET=$(echo $res | ./libs/JSON.sh -b\
+  | egrep '\["result",0,"update_id"\]' | cut -f 2)
+	MESSAGE=$(echo $res | ./libs/JSON.sh -b -s \
+  | egrep '\["result",0,"message","text"\]' | cut -f 2 | cut -d '"' -f 2)
+  message_id=$(echo $res | ./libs/JSON.sh \
+  | egrep '\["result",0,"message","message_id"\]' | cut -f 2)
+  unix_date=$(echo $res | ./libs/JSON.sh -b \
+  | egrep '\["result",0,"message","date"\]' | cut -f 2)
+  
   MESSAGE=${MESSAGE/@para_bot/}
   COMMAND="${MESSAGE%% *}"
   
 	OFFSET=$((OFFSET+1))
-  
-	if [ $OFFSET != 1 ]; then
-		case $COMMAND in
-			'/info')
+    
+	if [[ $unix_date > $(($bot_start-1)) ]]; then
+    case $COMMAND in
+      '/info')
         msg="This is para_bot, the Telegram bot written in bash."
       ;;
-      '/calc')  
-        msg="$(printf "%.2f\n" $(echo ${MESSAGE} | \
-        sed 's|/calc ||;s|libs  LICENSE  para_bot  plugins  README.md|*|' | bc -l))"
+      '/calc')
+        msg="$(printf "%.2f\n" ${MESSAGE:6} \
+        | sed 's|/calc ||;s|libs  LICENSE  para_bot  plugins  README.md|*|' \
+        | bc -l))"
       ;;
       '/ddg')
-        QUERY="$(echo ${MESSAGE/\/ddg /} | sed 's|[!]|%21|g;s| |+|g')"
-        msg="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$QUERY&kp=1\
-        &format=json&kp=1&no_redirect=1&no_html=1" | \
-        sed -e 's|.*Redirect":"\(.*\)","DefinitionURL.*|\1|')";;
+        QUERY=${MESSAGE:5}
+        QUERY=${QUERY/\!/\%21}
+        QUERY=${QUERY// /+}
+        if [[ $QUERY = *[!\ ]* ]]; then
+          msg="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$QUERY&kp=1\
+        &format=json&kp=1&no_redirect=1&no_html=1" \
+        | sed -e 's|.*Redirect":"\(.*\)","DefinitionURL.*|\1|')"
+        else
+          msg=$(printf "%s\n" "/ddg <query>" \
+          "This command performs a DuckDuckGo search for the given query.")
+        fi
+      ;;
       '/echo')
-        msg="${MESSAGE/\/echo /}"
+        gsm="${MESSAGE:6}"
+        [[ -n $gsm ]] && echo "ADA"
+        if [[ $gsm = *[!\ ]* ]]; then
+          msg=$gsm
+        else
+          msg=$(printf "%s\n" "/echo <text>" "Repeat a string.")
+        fi
       ;;
       '/help')  
         msg="Available commands:
@@ -73,13 +96,19 @@ while true; do {
         "WIT: $(($H+1)):$MS" "WITA: $(($H+2)):$MS")
       ;;
       '/kamus')  
-        QUERY="${MESSAGE/\/kamus /}"
-        msg="$(sed -n -e /^"$QUERY\t"/Ip ./libs/kbbi.txt | \
-        sed -e "s|[\]n|\n|g;s|^$QUERY.*\t||I")"
+        QUERY="${MESSAGE:7}"
+        WORD="$(sed -n -e /^"$QUERY\t"/Ip ./libs/kbbi.txt \
+        | sed -e "s|[\]n|\n|g;s|^$QUERY.*\t||I")"
+        
+        if [[ -n $WORD ]]; then
+          msg=$WORD
+        else
+          msg="Maaf, kata yang dicari tidak ada dalam KBBI Edisi III (2005)"
+        fi
       ;;
-      *) echo "Not defined";;
+      *) msg="";;
 		esac
-		send_message "$TARGET" "$msg" "$MSG_ID"
+		send_message "$TARGET" "$msg" "$message_id"
 	fi
 
 } &>/dev/null; done
