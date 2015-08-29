@@ -2,6 +2,7 @@
 
 # para_bot, the Telegram bot written in bash.
 # Written by si_kabayan
+# Inspired by http://github.com/topkecleon/bashbot
 
 # variables --------------------------------------------------------------------
 
@@ -51,7 +52,7 @@ while true; do {
   fi
 
   message=${message/@para_bot/}
-  
+
   offset=$((offset+1))
 
   if [[ $unix_date > $(($bot_start-1)) ]] && [[ $offset != 1 ]] \
@@ -59,7 +60,7 @@ while true; do {
   then
     case "${message%% *}" in
       '/info')
-        msg="This is para_bot, the Telegram bot written in bash."
+        msg='This is para_bot, the Telegram bot written in bash.'
       ;;
       '/calc')
         if [[ ${message:6} = *[!\ ]* ]]
@@ -73,8 +74,8 @@ while true; do {
             msg="$(printf "%s\n" ${expression%%.*}.${expression:(-20):2})"
           fi
         else
-          msg=$(printf "%s\n" "/calc <expression>" \
-          "Calculator powered by bc, an arbitrary precision calculator language.")
+          msg="/calc <expression>
+          Calculator powered by bc, an arbitrary precision calculator language."
         fi
       ;;
       '/ddg')
@@ -83,13 +84,13 @@ while true; do {
         query=${query// /+}
         if [[ $query = *[!\ ]* ]]
         then
-          result=$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$query&kp=1\
+          ddget=$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$query&kp=1\
           &format=json&kp=1&no_redirect=1&no_html=1")
-          result="${f##*Redirect\":\"}"
-          msg="${result%%\",\"DefinitionURL*}"
+          ddget="${f##*Redirect\":\"}"
+          msg="${ddget%%\",\"DefinitionURL*}"
         else
-          msg="$(printf "%s\n" "/ddg <query>" \
-          "Performs a DuckDuckGo instant search for the given query.")"
+          msg="/ddg <query>
+          Performs a DuckDuckGo instant search for the given query."
         fi
       ;;
       '/echo')
@@ -98,18 +99,19 @@ while true; do {
         then
           msg="$gsm"
         else
-          msg=$(printf "%s\n" "/echo <text>" "Repeat a string.")
+          msg="/echo <text>
+          Repeat a string."
         fi
       ;;
       '/help')
-        msg="Available commands:
+        msg='Available commands:
         - /about
         - /calc <expression>
         - /ddg <query>
         - /echo <text>
         - /help [command]
         - /info
-        - /jam"
+        - /jam'
       ;;
       '/jam')
         H=$(date +%H)
@@ -127,14 +129,14 @@ while true; do {
           then
             msg="$definition"
           else
-            msg="Maaf, kata yang dicari tidak ada dalam KBBI Edisi III (2005)"
+            msg='Maaf, kata yang dicari tidak ada dalam KBBI Edisi III (2005).'
           fi
         else
-          msg=$(printf "%s\n" "/kamus <term>" \
-          "Kamus Besar Bahasa Indonesia, Edisi III (2005).")
+          msg="/kamus <term>
+          Kamus Besar Bahasa Indonesia, Edisi III (2005)."
         fi
       ;;
-      *) msg="";;
+      *) msg='';;
     esac
     send_message "$chat_id" "$msg" "$message_id"
   fi
