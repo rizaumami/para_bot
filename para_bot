@@ -51,8 +51,8 @@ while true; do {
   fi
 
   message=${message/@para_bot/}
-
-	offset=$((offset+1))
+  
+  offset=$((offset+1))
 
   if [[ $unix_date > $(($bot_start-1)) ]] && [[ $offset != 1 ]] \
   && [[ $chat_id = -18812428 ]] || [[ $chat_id = -15387310 ]]
@@ -72,7 +72,8 @@ while true; do {
           else
             msg="$(printf "%s\n" ${expression%%.*}.${expression:(-20):2})"
           fi
-        elsemsg=$(printf "%s\n" "/calc <expression>" \
+        else
+          msg=$(printf "%s\n" "/calc <expression>" \
           "Calculator powered by bc, an arbitrary precision calculator language.")
         fi
       ;;
@@ -80,18 +81,21 @@ while true; do {
         query=${message:5}
         query=${query/\!/\%21}
         query=${query// /+}
-        if [[ $query = *[!\ ]* ]]; then
-          msg="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$query&kp=1\
-        &format=json&kp=1&no_redirect=1&no_html=1" \
-        | sed -e 's|.*Redirect":"\(.*\)","Definitionurl.*|\1|')"
+        if [[ $query = *[!\ ]* ]]
+        then
+          result=$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$query&kp=1\
+          &format=json&kp=1&no_redirect=1&no_html=1")
+          result="${f##*Redirect\":\"}"
+          msg="${result%%\",\"DefinitionURL*}"
         else
-          msg=$(printf "%s\n" "/ddg <query>" \
-          "This command performs a DuckDuckGo instant search for the given query.")
+          msg="$(printf "%s\n" "/ddg <query>" \
+          "Performs a DuckDuckGo instant search for the given query.")"
         fi
       ;;
       '/echo')
         gsm="${message:6}"
-        if [[ $gsm = *[!\ ]* ]]; then
+        if [[ $gsm = *[!\ ]* ]]
+        then
           msg="$gsm"
         else
           msg=$(printf "%s\n" "/echo <text>" "Repeat a string.")
@@ -119,9 +123,9 @@ while true; do {
         then
           definition="$(sed -n -e /^"$query\t"/Ip ./libs/kbbi.txt \
           | sed -e "s|[\]n|\n|g;s|^$query.*\t||I")"
-
-          if [[ -n $definition ]]; then
-            msg=$definition
+          if [[ -n $definition ]]
+          then
+            msg="$definition"
           else
             msg="Maaf, kata yang dicari tidak ada dalam KBBI Edisi III (2005)"
           fi
@@ -131,8 +135,8 @@ while true; do {
         fi
       ;;
       *) msg="";;
-		esac
-		send_message "$chat_id" "$msg" "$message_id"
-	fi
+    esac
+    send_message "$chat_id" "$msg" "$message_id"
+  fi
 
 } &>/dev/null; done
