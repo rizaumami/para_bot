@@ -138,10 +138,21 @@ while true; do {
         location="${message:5}"
         if [[ ${message:4} = *[!\ ]* ]]
         then
-          get_jam=$(curl -s -X GET "http://api.openweathermap.org/data/2.5/weather?q=${location,,}&units=metric")
-          get_jam=${get_jam##*\"dt\":}
-          get_jam=${get_jam%%,*}
-          msg="$(printf "%s\n" "$(date -d @${get_jam})")"
+          coords="$(curl -g "http://maps.googleapis.com/maps/api/geocode/json?address=${location// /+}")"
+          coords=${coords##*\"location\"}
+          coords=(${coords%%\ \}*})
+
+          time_zone="$(curl -g "https://maps.googleapis.com/maps/api/timezone/json?location=${coords[4]}${coords[7]}&timestamp=$(date +%s)")"
+          tz_array=${time_zone##*\"dstOffset\"\ [:]\ }
+          tz_array=${tz_array//,/}
+          tz_array=(${tz_array%%[}]*})
+          tz_name=${time_zone##*\"timeZoneName\"\ [:]\ \"}
+          tz_name=${tz_name%%\"*}
+
+          time_utc=$(($(date -u +%s)+${tz_array[0]}+${tz_array[3]}))
+
+          msg="$(printf "%b\n" "$(date -u --date=@${time_utc} \
+          "+%T \n%A, %d %B %Y \n${tz_name}")")"
         else
           msg="/jam <location>
           Sends the time and date for a given location."
