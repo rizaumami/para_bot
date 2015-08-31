@@ -1,0 +1,30 @@
+function cuaca() {
+
+  location=${message:7}
+
+  if [[ ${message:6} = *[!\ ]* ]]
+  then
+    weather="$(curl "http://api.openweathermap.org/data/2.5/weather?q=${location// /+}&units=metric")"
+    cuaca=${weather##*\"temp\":}
+    cuaca=${cuaca%%,*}
+    country=${weather##*\"country\":\"}
+    country=${country%%\"*}
+    sky_is=${weather##*\"description\":\"}
+    sky_is=${sky_is%%\"*}
+    kota=${weather##*\"name\":\"}
+    kota=${kota%%\"*}
+
+    if [[ "${kota,,}" =~ "${location,,}" ]]
+    then
+      msg="$(printf "%s\n" "Weather in ${location^}, $country" "$cuaca °C, $sky_is")"
+    else
+      msg="Maaf, openweathermap.org tidak memiliki data cuaca ${message:7} terkini."
+    fi
+  else
+    msg="/cuaca <location>
+    Returns the current temperature and weather conditions for a specified location."
+  fi
+
+  send_message
+
+}

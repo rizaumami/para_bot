@@ -1,0 +1,27 @@
+function help() {
+
+  command="${message:6}"
+  command=${command//\//}
+
+  if [[ ${message:5} = *[!\ ]* ]]
+  then
+    pb_bash=$(< $0)
+    cmd_help=${pb_bash##*msg=\"\/${command}}
+    cmd_help=${cmd_help%%.\"*}
+
+    msg="$(printf "%s\n" "${message:6} ${cmd_help}")"
+  else
+    msg="Available commands:
+    - /about
+    - /calc <expression>
+    - /cuaca <location>
+    - /ddg <query>
+    - /echo <text>
+    - /help [command]
+    - /info
+    - /jam"
+  fi
+
+  send_message
+
+}

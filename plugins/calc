@@ -1,0 +1,13 @@
+function calc() {
+
+  if [[ ${message:5} = *[!\ ]* ]]
+  then
+    msg="$(printf "%s\n" "scale=2; ${message:6}" | bc -l 2>&1)"
+  else
+    msg="/calc <expression>
+    Calculator powered by bc, an arbitrary precision calculator language."
+  fi
+
+  send_message
+
+}

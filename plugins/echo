@@ -1,0 +1,13 @@
+function gema() {
+
+ if [[ ${message:5} = *[!\ ]* ]]
+ then
+   msg="${message:6}"
+ else
+   msg="/echo <text>
+   Repeat a string."
+ fi
+
+  send_message
+
+}

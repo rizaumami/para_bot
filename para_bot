@@ -7,21 +7,28 @@
 
 token=''
 url='https://api.telegram.org/bot'$token
-send_massage=$url'/sendMessage?chat_id='
-get_updates=$url'/getUpdates?offset='
+sendMessage=$url'/sendMessage?chat_id='
+getUpdates=$url'/getUpdates?offset='
 bot_start=$(date +%s)
 
 # functions --------------------------------------------------------------------
 
+for file in ./plugins/*
+do
+  if [[ -f $file ]]
+  then
+    . $file
+  fi
+done
+
 function send_message {
-  curl --data-urlencode "action=typing" "$url/sendChatAction?chat_id=$1&"
-  res=$(curl --data-urlencode "text=$2" \
-  "$send_massage$1&reply_to_message_id=$3&disable_web_page_preview=1&")
+  curl --data-urlencode "action=typing" "$url/sendChatAction?chat_id=$chat_id&"
+  res=$(curl --data-urlencode "text=$msg" "$sendMessage$chat_id&reply_to_message_id=$message_id&disable_web_page_preview=1&")
 }
 
 # main -------------------------------------------------------------------------
 
-offset=$(curl "$get_updates")
+offset=$(curl "$getUpdates")
 offset=${offset##*update_id\":}
 offset=${offset%%,*}
 
@@ -29,30 +36,44 @@ while true; do {
 
   set -f
 
-  res=$(curl -g "$get_updates$offset%26timeout=20")
+  res=$(curl -g "$getUpdates$offset%26timeout=20")
 
   if [[ ${#res} > 23 ]]
   then
-    chat_id=${res##*id\":}
-    chat_id=${chat_id%%,*}
-    offset=${res#*update_id\":}
+    offset=${res#*\"update_id\":}
     offset=${offset%%,*}
-    message=${res#*\\}
+    message_id=${res#*\"message_id\":}
+    message_id=${message_id%%,*}
+    user_id=${res#*\"id\":}
+    user_id=${user_id%%,*}
+    first_name=${res#*\"first_name\":}
+    first_name=${first_name%%,*}
+    username=${res#*\"username\":}
+    username=${username%%,*}
+    chat_id=${res##*\"chat\":\{\"id\":}
+    chat_id=${chat_id%%,*}
+    title=${res#*\"title\":}
+    title=${title%%,*}
+    msg_date=${res#*\"date\":}
+    msg_date=${msg_date%%,*}
+    message=${res##*\"text\":\"\\}
     message=${message%%\"*}
     message=${message/\\/}
-    message_id=${res#*message_id\":}
-    message_id=${message_id%%,*}
+    message=${message/@para_bot/}
     unix_date=${res##*date\":}
     export unix_date=${unix_date%%,*}
   else
-    chat_id=
     offset=
-    message=
     message_id=
-    unix_date=
+    user_id=
+    first_name=
+    username=
+    chat_id=
+    title=
+    msg_date=
+    message=
+    export unix_date=
   fi
-
-  message=${message/@para_bot/}
 
   offset=$((offset+1))
 
@@ -63,132 +84,27 @@ while true; do {
         msg='This is para_bot, the Telegram bot written in bash.'
       ;;
       '/calc')
-        if [[ ${message:5} = *[!\ ]* ]]
-        then
-          msg="$(printf "%s\n" "scale=2; ${message:6}" | bc -l 2>&1)"
-        else
-          msg="/calc <expression>
-          Calculator powered by bc, an arbitrary precision calculator language."
-        fi
+        calc
       ;;
       '/cuaca')
-        location=${message:7}
-        if [[ ${message:6} = *[!\ ]* ]]
-        then
-          weather="$(curl "http://api.openweathermap.org/data/2.5/weather?q=${location// /+}&units=metric")"
-          cuaca=${weather##*\"temp\":}
-          cuaca=${cuaca%%,*}
-          country=${weather##*\"country\":\"}
-          country=${country%%\"*}
-          sky_is=${weather##*\"description\":\"}
-          sky_is=${sky_is%%\"*}
-          kota=${weather##*\"name\":\"}
-          kota=${kota%%\"*}
-          if [[ "${kota,,}" =~ "${location,,}" ]]
-          then
-            msg="$(printf "%s\n" "Weather in ${location^}, $country" \
-            "$cuaca °C, $sky_is")"
-          else
-            msg="Maaf, openweathermap.org tidak memiliki data cuaca \
-            ${message:7} terkini."
-          fi
-        else
-          msg="/cuaca <location>
-          Returns the current temperature and weather conditions for a \
-          specified location."
-        fi
+        cuaca
       ;;
       '/ddg')
-        ddg_query=${message:5}
-        ddg_query=${ddg_query/\!/\%21}
-        ddg_query=${ddg_query// /+}
-        if [[ ${message:4} = *[!\ ]* ]]
-        then
-          ddget="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$ddg_query\
-          &kp=1&format=json&kp=1&no_redirect=1&no_html=1")"
-          ddget="${ddget##*Redirect\":\"}"
-          msg="${ddget%%\",\"DefinitionURL*}"
-        else
-          msg="/ddg <query>
-          Performs a DuckDuckGo instant search for the given query."
-        fi
+        duckduckgo
       ;;
       '/echo')
-        echo_msg="${message:5}"
-        if [[ $echo_msg = *[!\ ]* ]]
-        then
-          msg="$echo_msg"
-        else
-          msg="/echo <text>
-          Repeat a string."
-        fi
+        gema
       ;;
       '/help')
-        command="${message:6}"
-        command=${command//\//}
-        if [[ ${message:5} = *[!\ ]* ]]
-        then
-          pb_bash=$(< $0)
-          cmd_help=${pb_bash##*msg=\"\/${command}}
-          cmd_help=${cmd_help%%.\"*}
-
-          msg="$(printf "%s\n" "${message:6} ${cmd_help}")"
-        else
-          msg="Available commands:
-          - /about
-          - /calc <expression>
-          - /cuaca <location>
-          - /ddg <query>
-          - /echo <text>
-          - /help [command]
-          - /info
-          - /jam"
-        fi
+        help
       ;;
       '/jam')
-        location="${message:5}"
-        if [[ ${message:4} = *[!\ ]* ]]
-        then
-          coords="$(curl -g "http://maps.googleapis.com/maps/api/geocode/json?address=${location// /+}")"
-          coords=${coords##*\"location\"}
-          coords=(${coords%%\ \}*})
-
-          time_zone="$(curl -g "https://maps.googleapis.com/maps/api/timezone/json?location=${coords[4]}${coords[7]}&timestamp=$(date +%s)")"
-          tz_array=${time_zone##*\"dstOffset\"\ [:]\ }
-          tz_array=${tz_array//,/}
-          tz_array=(${tz_array%%[}]*})
-          tz_name=${time_zone##*\"timeZoneName\"\ [:]\ \"}
-          tz_name=${tz_name%%\"*}
-
-          time_utc=$(($(date -u +%s)+${tz_array[0]}+${tz_array[3]}))
-
-          msg="$(printf "%b\n" "$(date -u --date=@${time_utc} \
-          "+%T \n%A, %d %B %Y \n${tz_name}")")"
-        else
-          msg="/jam <location>
-          Sends the time and date for a given location."
-        fi
+        jam
       ;;
       '/kamus')
-        query="${message:7}"
-        if [[ ${message:6} = *[!\ ]* ]]
-        then
-          definition="$(while read -r line; do [[ $line =~ ^${query,,}[[:cntrl:]] ]] \
-          && printf "%b\n" "$line"; done < ./libs/kbbi)"
-          if [[ -n $definition ]]
-          then
-            msg="$definition"
-          else
-            msg='Maaf, kata yang dicari tidak ada dalam KBBI Edisi III (2005).'
-          fi
-        else
-          msg="/kamus <term>
-          Kamus Besar Bahasa Indonesia, Edisi III (2005)."
-        fi
+        kamus
       ;;
-      *) msg='';;
     esac
-    send_message "$chat_id" "$msg" "$message_id"
   fi
 
 } &>/dev/null; done
