@@ -75,13 +75,25 @@ while true; do {
     export unix_date=
   fi
 
+  #echo "chat_id: $chat_id"
+  #echo "message: $message"
+  #echo "message_id: $message_id"
+  #echo "unix_date: $unix_date"
+  #echo "bot_start: $bot_start"
+
+
+
+  #echo "offset: $offset"
   offset=$((offset+1))
+  #echo "offset+1: $offset"
+
+  #echo "url: $get_updates$offset%26timeout=20"
 
   if [[ $offset != 1 ]] && [[ $chat_id = -18812428 ]] || [[ $chat_id = -15387310 ]]
   then
     case "${message%% *}" in
-      '/info')
-        msg='This is para_bot, the Telegram bot written in bash.'
+      '/adzan')
+        adzan
       ;;
       '/calc')
         calc
@@ -98,6 +110,9 @@ while true; do {
       '/help')
         help
       ;;
+      '/info')
+        msg='This is para_bot, the Telegram bot written in bash.'
+      ;;
       '/jam')
         jam
       ;;
@@ -107,4 +122,5 @@ while true; do {
     esac
   fi
 
-} &>/dev/null; done
+#} &>/dev/null; done
+} done
