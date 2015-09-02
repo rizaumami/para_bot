@@ -5,7 +5,8 @@
 
 # variables --------------------------------------------------------------------
 
-token=''
+. para_bot.conf
+
 url='https://api.telegram.org/bot'$token
 sendMessage=$url'/sendMessage?chat_id='
 getUpdates=$url'/getUpdates?offset='
@@ -75,21 +76,9 @@ while true; do {
     export unix_date=
   fi
 
-  #echo "chat_id: $chat_id"
-  #echo "message: $message"
-  #echo "message_id: $message_id"
-  #echo "unix_date: $unix_date"
-  #echo "bot_start: $bot_start"
-
-
-
-  #echo "offset: $offset"
   offset=$((offset+1))
-  #echo "offset+1: $offset"
 
-  #echo "url: $get_updates$offset%26timeout=20"
-
-  if [[ $offset != 1 ]] && [[ $chat_id = -18812428 ]] || [[ $chat_id = -15387310 ]]
+  if [[ $offset != 1 ]] && [[ $chat_id = ${allowed[0]} ]] || [[ $chat_id = ${allowed[1]} ]]
   then
     case "${message%% *}" in
       '/adzan')
@@ -122,5 +111,4 @@ while true; do {
     esac
   fi
 
-#} &>/dev/null; done
-} done
+} &>/dev/null; done

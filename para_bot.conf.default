@@ -1,0 +1,6 @@
+# bot's token here
+token=
+
+# bot have no ability to leave a group
+# only respond to this group/chat_id
+allowed=
