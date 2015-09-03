@@ -1,8 +1,8 @@
-function kamus() {
+kamus() {
 
   query="${message:7}"
 
-  if [[ ${message:6} = *[!\ ]* ]]
+  if [[ ${message:6} = "*[!\ ]*" ]]
   then
     definition="$(while read -r line; do [[ $line =~ ^${query,,}[[:cntrl:]] ]] && printf "%b\n" "$line"; done < ./libs/kbbi)"
 

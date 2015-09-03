@@ -10,7 +10,7 @@
 url='https://api.telegram.org/bot'$token
 sendMessage=$url'/sendMessage?chat_id='
 getUpdates=$url'/getUpdates?offset='
-bot_start=$(date +%s)
+bot_start="$(date +%s)"
 
 # functions --------------------------------------------------------------------
 
@@ -22,47 +22,47 @@ do
   fi
 done
 
-function send_message {
+send_message() {
   curl --data-urlencode "action=typing" "$url/sendChatAction?chat_id=$chat_id&"
   res=$(curl --data-urlencode "text=$msg" "$sendMessage$chat_id&reply_to_message_id=$message_id&disable_web_page_preview=1&")
 }
 
 # main -------------------------------------------------------------------------
 
-offset=$(curl "$getUpdates")
-offset=${offset##*update_id\":}
-offset=${offset%%,*}
+offset="$(curl "$getUpdates")"
+offset="${offset##*update_id\":}"
+offset="${offset%%,*}"
 
 while true; do {
 
   set -f
 
-  res=$(curl -g "$getUpdates$offset%26timeout=20")
+  res=$(curl -g "$getUpdates$offset%26timeout=30")
 
-  if [[ ${#res} > 23 ]]
+  if (( ${#res} > 23 ))
   then
-    offset=${res#*\"update_id\":}
-    offset=${offset%%,*}
-    message_id=${res#*\"message_id\":}
-    message_id=${message_id%%,*}
-    user_id=${res#*\"id\":}
-    user_id=${user_id%%,*}
-    first_name=${res#*\"first_name\":}
-    first_name=${first_name%%,*}
-    username=${res#*\"username\":}
-    username=${username%%,*}
-    chat_id=${res##*\"chat\":\{\"id\":}
-    chat_id=${chat_id%%,*}
-    title=${res#*\"title\":}
-    title=${title%%,*}
-    msg_date=${res#*\"date\":}
-    msg_date=${msg_date%%,*}
-    message=${res##*\"text\":\"\\}
-    message=${message%%\"*}
-    message=${message/\\/}
-    message=${message/@para_bot/}
-    unix_date=${res##*date\":}
-    export unix_date=${unix_date%%,*}
+    offset="${res#*\"update_id\":}"
+    offset="${offset%%,*}"
+    message_id="${res#*\"message_id\":}"
+    message_id="${message_id%%,*}"
+    user_id="${res#*\"id\":}"
+    user_id="${user_id%%,*}"
+    first_name="${res#*\"first_name\":}"
+    first_name="${first_name%%,*}"
+    username="${res#*\"username\":}"
+    username="${username%%,*}"
+    chat_id="${res##*\"chat\":\{\"id\":}"
+    chat_id="${chat_id%%,*}"
+    title="${res#*\"title\":}"
+    title="${title%%,*}"
+    msg_date="${res#*\"date\":}"
+    msg_date="${msg_date%%,*}"
+    message="${res##*\"text\":\"\\}"
+    message="${message%%\"*}"
+    message="${message/\\/}"
+    message="${message/@para_bot/}"
+    unix_date="${res##*date\":}"
+    export unix_date="${unix_date%%,*}"
   else
     offset=
     message_id=
@@ -76,14 +76,11 @@ while true; do {
     export unix_date=
   fi
 
-  offset=$((offset+1))
+  offset="$((offset+1))"
 
-  if [[ $offset != 1 ]] && [[ $chat_id = ${allowed[0]} ]] || [[ $chat_id = ${allowed[1]} ]]
+  if [[ $offset != "1" && $chat_id = "${allowed[0]}" || $chat_id = "${allowed[1]}" ]]
   then
     case "${message%% *}" in
-      '/adzan')
-        adzan
-      ;;
       '/calc')
         calc
       ;;
@@ -107,6 +104,9 @@ while true; do {
       ;;
       '/kamus')
         kamus
+      ;;
+      '/shalat')
+        shalat
       ;;
     esac
   fi

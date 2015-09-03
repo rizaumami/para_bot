@@ -1,4 +1,4 @@
-function cuaca() {
+cuaca() {
 
   location=${message:7}
 

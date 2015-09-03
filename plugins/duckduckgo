@@ -1,4 +1,4 @@
-function duckduckgo() {
+duckduckgo() {
 
  ddg_query=${message:5}
  ddg_query=${ddg_query/\!/\%21}

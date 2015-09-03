@@ -1,4 +1,4 @@
-function calc() {
+calc() {
 
   if [[ ${message:5} = *[!\ ]* ]]
   then

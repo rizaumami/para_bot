@@ -1,6 +1,6 @@
-function gema() {
+gema() {
 
- if [[ ${message:5} = *[!\ ]* ]]
+ if [[ ${message:5} = "*[!\ ]*" ]]
  then
    msg="${message:6}"
  else

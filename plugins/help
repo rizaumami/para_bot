@@ -1,15 +1,15 @@
-function help() {
+help() {
 
   command="${message:6}"
   command=${command//\//}
 
-  if [[ ${message:5} = *[!\ ]* ]]
+  if [[ ${message:5} = "*[!\ ]*" &&  -f ./plugins/"${command}" ]]
   then
-    pb_bash=$(< $0)
-    cmd_help=${pb_bash##*msg=\"\/${command}}
-    cmd_help=${cmd_help%%.\"*}
+    plugs=$(< ./plugins/${command})
+    cmd_help=${plugs##*msg=\"}
+    cmd_help=${cmd_help%%\"*}
 
-    msg="$(printf "%s\n" "${message:6} ${cmd_help}")"
+    msg="${cmd_help}"
   else
     msg="Available commands:
     - /about
@@ -19,7 +19,9 @@ function help() {
     - /echo <text>
     - /help [command]
     - /info
-    - /jam"
+    - /jam <location>
+    - /kamus <term>
+    - /shalat <location>"
   fi
 
   send_message

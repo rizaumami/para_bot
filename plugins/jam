@@ -1,4 +1,4 @@
-function jam() {
+jam() {
 
  location="${message:5}"
 

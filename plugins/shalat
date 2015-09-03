@@ -1,6 +1,6 @@
 # As slow as my internet, at least this is not expensive :D ...
 
-function shalat() {
+shalat() {
 
   loc="${message:8}"
 
@@ -21,12 +21,12 @@ function shalat() {
       shalat="$(/usr/bin/python ./libs/praytimes.py ${lon} ${lat} ${tz})"
       msg="$(printf "%b\n" "Waktu shalat di ${message:8} untuk hari ini adalah:\n\n$shalat")"
     else
-      msg="Maaf, adzan untuk ${message:8} tidak dapat diperhitungkan karena tidak ada dalam database lokasi dan atau bukan merupakan tempat di Indonesia."
+      msg="Maaf, waktu shalat untuk ${message:8} tidak dapat diperhitungkan karena tidak ada dalam database lokasi dan atau bukan merupakan tempat di Indonesia."
     fi
 
   else
-    msg="/adzan <location>
-    Waktu adzan suatu tempat di Indonesia."
+    msg="/shalat <location>
+    Waktu shalat suatu tempat di Indonesia."
   fi
 
   send_message
