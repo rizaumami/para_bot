@@ -1,0 +1,19 @@
+duckduckgo() {
+
+ ddg_query=${message:5}
+ ddg_query=${ddg_query/\!/\%21}
+ ddg_query=${ddg_query// /+}
+
+ if [[ ${message:4} = *[!\ ]* ]]
+ then
+   ddget="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$ddg_query&kp=1&format=json&kp=1&no_redirect=1&no_html=1")"
+   ddget="${ddget##*Redirect\":\"}"
+   msg="${ddget%%\",\"DefinitionURL*}"
+ else
+   msg='/ddg <query>
+   Performs a DuckDuckGo instant search for the given query.'
+ fi
+
+  send_message
+
+}
