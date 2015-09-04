@@ -56,13 +56,11 @@ while true; do {
     title="${res#*\"title\":}"
     title="${title%%,*}"
     msg_date="${res#*\"date\":}"
-    msg_date="${msg_date%%,*}"
+    export msg_date="${msg_date%%,*}"
     message="${res##*\"text\":\"\\}"
     message="${message%%\"*}"
     message="${message/\\/}"
     message="${message/@para_bot/}"
-    unix_date="${res##*date\":}"
-    export unix_date="${unix_date%%,*}"
   else
     offset=
     message_id=
@@ -73,42 +71,45 @@ while true; do {
     title=
     msg_date=
     message=
-    export unix_date=
+    export msg_date=
   fi
 
   offset="$((offset+1))"
 
-  if [[ $offset != "1" && $chat_id = "${allowed[0]}" || $chat_id = "${allowed[1]}" ]]
+  if [[ $offset != "1" ]]
   then
-    case "${message%% *}" in
-      '/calc')
-        calc
-      ;;
-      '/cuaca')
-        cuaca
-      ;;
-      '/ddg')
-        duckduckgo
-      ;;
-      '/echo')
-        gema
-      ;;
-      '/help')
-        help
-      ;;
-      '/info')
-        msg='This is para_bot, the Telegram bot written in bash.'
-      ;;
-      '/jam')
-        jam
-      ;;
-      '/kamus')
-        kamus
-      ;;
-      '/shalat')
-        shalat
-      ;;
-    esac
+    if [[ $chat_id > 0 || $chat_id = "${allowed[0]}" || $chat_id = "${allowed[1]}" ]]
+    then
+      case "${message%% *}" in
+        '/calc')
+          calc
+        ;;
+        '/cuaca')
+          cuaca
+        ;;
+        '/ddg')
+          duckduckgo
+        ;;
+        '/echo')
+          gema
+        ;;
+        '/help')
+          help
+        ;;
+        '/info')
+          msg='This is para_bot, the Telegram bot written in bash.'
+        ;;
+        '/jam')
+          jam
+        ;;
+        '/kamus')
+          kamus
+        ;;
+        '/shalat')
+          shalat
+        ;;
+      esac
+    fi
   fi
 
 } &>/dev/null; done
