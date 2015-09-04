@@ -78,7 +78,7 @@ while true; do {
 
   if [[ $offset != "1" ]]
   then
-    if [[ $chat_id > 0 || $chat_id = "${allowed[0]}" || $chat_id = "${allowed[1]}" ]]
+    if [[ $chat_id > 0 || $chat_id = "${allowed[@]}" ]]
     then
       case "${message%% *}" in
         '/calc')
@@ -105,8 +105,14 @@ while true; do {
         '/kamus')
           kamus
         ;;
+        '/kurs')
+          kurs
+        ;;
         '/shalat')
           shalat
+        ;;
+        '/start')
+          help
         ;;
       esac
     fi

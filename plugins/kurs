@@ -1,0 +1,24 @@
+kurs() {
+
+  req="${message:6}"
+
+  if [[ ${message:5} = *[!\ ]* ]]
+  then
+    to_curr=${req#*\ }
+    to_curr=${to_curr%\ *}
+
+    g_conv="$(curl -s -X GET "http://www.google.com/finance/converter?from=${req%%\ *}&to=$to_curr&a=${req##*\ }")"
+
+    kurs="${g_conv##*'currency_converter_result>'}"
+    kurs="${kurs%%'</span'*}"
+
+    msg="${kurs//'<span class=bld>'/}"
+  else
+    msg='/kurs <dari> <ke> [besaran]
+    Kisaran kurs nilai tukar berdasar Google Finance converter.
+    Contoh: /kurs USD IDR 1'
+  fi
+
+  send_message
+
+}
