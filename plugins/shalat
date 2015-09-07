@@ -2,31 +2,29 @@
 
 shalat() {
 
-  loc="${message:8}"
+  local LOC="${MESSAGE:7}"
 
-  if [[ ${message:7} = *[!\ ]* ]]
-  then
+  if [[ ${MESSAGE:6} = *[!\ ]* ]]; then
     while read -r line
-      do [[ $line =~ ^"${loc}," ]] && loc= && lonlatz=$line
+      do [[ $line =~ ^"${LOC}," ]] && local LOC= && local LONLATZ=$line
     done < ./libs/indo_geoid
 
-    lon=${lonlatz#*,}
-    lon=${lon%%,*}
-    lat=${lonlatz%,*}
-    lat=${lat##*,}
-    tz=${lonlatz##*,}
+    local LON="${LONLATZ#*,}"
+    local LON="${LON%%,*}"
+    local LAT="${LONLATZ%,*}"
+    local LAT="${LAT##*,}"
+    local TZ="${LONLATZ##*,}"
 
-    if [[ -n $lonlatz ]]
-    then
-      shalat="$(/usr/bin/python ./libs/praytimes.py ${lon} ${lat} ${tz})"
-      msg="$(printf "%b\n" "Waktu shalat di ${message:8} untuk hari ini adalah:\n\n$shalat")"
+    if [[ -n $LONLATZ ]]; then
+      local SHALAT="$(/usr/bin/python ./libs/praytimes.py ${LON} ${LAT} ${TZ})"
+      msg="$(printf "%b\n" "Waktu shalat di $LOC untuk hari ini adalah:\n\n$SHALAT")"
     else
-      msg="Maaf, waktu shalat untuk ${message:8} tidak dapat diperhitungkan karena tidak ada dalam database lokasi dan atau bukan merupakan tempat di Indonesia."
+      msg="Maaf, waktu shalat untuk $LOC tidak dapat diperhitungkan karena tidak ada dalam database lokasi dan atau bukan merupakan tempat di Indonesia."
     fi
 
   else
-    msg="/shalat <location>
-    Waktu shalat suatu tempat di Indonesia."
+    msg='/shalat <location>
+    Waktu shalat suatu tempat di Indonesia.'
   fi
 
   send_message

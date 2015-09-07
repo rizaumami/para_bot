@@ -3,119 +3,88 @@
 # para_bot, the Telegram bot written in bash.
 # Written by si_kabayan
 
+#set -o nounset
+#set -o errexit
+#set -o pipefail
+
 # variables --------------------------------------------------------------------
 
 . para_bot.conf
 
-url='https://api.telegram.org/bot'$token
-sendMessage=$url'/sendMessage?chat_id='
-getUpdates=$url'/getUpdates?offset='
-bot_start="$(date +%s)"
+TG_URL='https://api.telegram.org/bot'$TOKEN
+SND_MSG=$TG_URL'/sendMessage?chat_id='
+GET_UPD=$TG_URL'/getUpdates?offset='
+BOT_START="$(date +%s)"
 
-# functions --------------------------------------------------------------------
-
-for file in ./plugins/*
-do
-  if [[ -f $file ]]
-  then
+for file in ./plugins/* ; do
+  if [[ -f $file ]]; then
     . $file
   fi
 done
 
+# functions --------------------------------------------------------------------
+
 send_message() {
-  curl --data-urlencode "action=typing" "$url/sendChatAction?chat_id=$chat_id&"
-  res=$(curl --data-urlencode "text=$msg" "$sendMessage$chat_id&reply_to_message_id=$message_id&disable_web_page_preview=1&")
+  curl --data-urlencode "action=typing" "$TG_URL/sendChatAction?chat_id=$CHAT_ID&"
+  res=$(curl --data-urlencode "text=$msg" "$SND_MSG$CHAT_ID&reply_to_message_id=$MESSAGE_ID&disable_web_page_preview=1&")
 }
 
 # main -------------------------------------------------------------------------
 
-offset="$(curl "$getUpdates")"
-offset="${offset##*update_id\":}"
-offset="${offset%%,*}"
+OFFSET="$(curl "$GET_UPD")"
+OFFSET="${OFFSET##*update_id\":}"
+OFFSET="${OFFSET%%,*}"
 
 while true; do {
 
   set -f
 
-  res=$(curl -g "$getUpdates$offset%26timeout=30")
+  res=$(curl -g "$GET_UPD$OFFSET%26timeout=30")
 
-  if (( ${#res} > 23 ))
-  then
-    offset="${res#*\"update_id\":}"
-    offset="${offset%%,*}"
-    message_id="${res#*\"message_id\":}"
-    message_id="${message_id%%,*}"
-    user_id="${res#*\"id\":}"
-    user_id="${user_id%%,*}"
-    first_name="${res#*\"first_name\":}"
-    first_name="${first_name%%,*}"
-    username="${res#*\"username\":}"
-    username="${username%%,*}"
-    chat_id="${res##*\"chat\":\{\"id\":}"
-    chat_id="${chat_id%%,*}"
-    title="${res#*\"title\":}"
-    title="${title%%,*}"
-    msg_date="${res#*\"date\":}"
-    export msg_date="${msg_date%%,*}"
-    message="${res##*\"text\":\"\\}"
-    message="${message%%\"*}"
-    message="${message/\\/}"
-    message="${message/@para_bot/}"
+  if (( ${#res} > 23 )); then
+    OFFSET="${res#*\"update_id\":}"
+    OFFSET="${OFFSET%%,*}"
+    MESSAGE_ID="${res#*\"message_id\":}"
+    MESSAGE_ID="${MESSAGE_ID%%,*}"
+    USER_ID="${res#*\"id\":}"
+    USER_ID="${USER_ID%%,*}"
+    FIRST_NAME="${res#*\"first_name\":}"
+    FIRST_NAME="${FIRST_NAME%%,*}"
+    USERNAME="${res#*\"username\":}"
+    USERNAME="${USERNAME%%,*}"
+    CHAT_ID="${res##*\"chat\":\{\"id\":}"
+    CHAT_ID="${CHAT_ID%%,*}"
+    TITLE="${res#*\"title\":}"
+    TITLE="${TITLE%%,*}"
+    MSG_DATE="${res#*\"date\":}"
+    export MSG_DATE="${MSG_DATE%%,*}"
+    MESSAGE="${res##*\"text\":\"\\\/}"
+    MESSAGE="${MESSAGE%%\"*}"
+    MESSAGE="${MESSAGE/\\/}"
+    MESSAGE="${MESSAGE/@para_bot/}"
   else
-    offset=
-    message_id=
-    user_id=
-    first_name=
-    username=
-    chat_id=
-    title=
-    msg_date=
-    message=
-    export msg_date=
+    OFFSET=
+    MESSAGE_ID=
+    USER_ID=
+    FIRST_NAME=
+    USERNAME=
+    CHAT_ID=
+    TITLE=
+    MSG_DATE=
+    MESSAGE=
+    export MSG_DATE=
   fi
 
-  offset="$((offset+1))"
+  OFFSET="$((OFFSET+1))"
 
-  if [[ $offset != "1" ]]
-  then
-    if [[ $chat_id > 0 || $chat_id = "${allowed[@]}" ]]
-    then
-      case "${message%% *}" in
-        '/calc')
-          calc
-        ;;
-        '/cuaca')
-          cuaca
-        ;;
-        '/ddg')
-          duckduckgo
-        ;;
-        '/echo')
-          gema
-        ;;
-        '/help')
-          help
-        ;;
-        '/info')
-          msg='This is para_bot, the Telegram bot written in bash.'
-        ;;
-        '/jam')
-          jam
-        ;;
-        '/kamus')
-          kamus
-        ;;
-        '/kurs')
-          kurs
-        ;;
-        '/shalat')
-          shalat
-        ;;
-        '/start')
-          help
-        ;;
-      esac
+  if [[ $OFFSET != "1" ]]; then
+    if [[ $CHAT_ID > 0 || $CHAT_ID = "${ALLOWED[@]}" ]] ; then
+      if [[ "$(type -t ${MESSAGE%% *})" = "function" ]]; then
+        $("${MESSAGE%% *}")
+      fi
     fi
   fi
+
+  unset -f
 
 } &>/dev/null; done

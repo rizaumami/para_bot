@@ -1,14 +1,13 @@
-duckduckgo() {
+ddg() {
 
- ddg_query=${message:5}
- ddg_query=${ddg_query/\!/\%21}
- ddg_query=${ddg_query// /+}
+ local DDG_QUERY=${MESSAGE:4}
+ local DDG_QUERY=${DDG_QUERY/\!/\%21}
+ local DDG_QUERY=${DDG_QUERY// /+}
 
- if [[ ${message:4} = *[!\ ]* ]]
- then
-   ddget="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$ddg_query&kp=1&format=json&kp=1&no_redirect=1&no_html=1")"
-   ddget="${ddget##*Redirect\":\"}"
-   msg="${ddget%%\",\"DefinitionURL*}"
+ if [[ ${MESSAGE:3} = *[!\ ]* ]]; then
+   local DDGET="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$DDG_QUERY&kp=1&format=json&kp=1&no_redirect=1&no_html=1")"
+   local DDGET="${DDGET##*Redirect\":\"}"
+   msg="${DDGET%%\",\"DefinitionURL*}"
  else
    msg='/ddg <query>
    Performs a DuckDuckGo instant search for the given query.'

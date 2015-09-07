@@ -1,17 +1,16 @@
 help() {
 
-  command="${message:6}"
-  command=${command//\//}
+  local COMMAND="${MESSAGE:5}"
+  local COMMAND=${COMMAND//\//}
 
-  if [[ ${message:5} = "*[!\ ]*" &&  -f ./plugins/"${command}" ]]
-  then
-    plugs=$(< ./plugins/${command})
-    cmd_help=${plugs##*msg=\"}
-    cmd_help=${cmd_help%%\"*}
+  if [[ ${MESSAGE:4} = *[!\ ]* &&  -f ./plugins/"${COMMAND}" ]]; then
+    local PLUGS=$(< ./plugins/${COMMAND})
+    local CMD_HELP=${PLUGS##*msg=\'}
+    local CMD_HELP=${CMD_HELP%%\'*}
 
-    msg="${cmd_help}"
+    msg="${CMD_HELP}"
   else
-    msg="Available commands:
+    msg='Available commands:
     - /about
     - /calc <expression>
     - /cuaca <location>
@@ -21,7 +20,7 @@ help() {
     - /info
     - /jam <location>
     - /kamus <term>
-    - /shalat <location>"
+    - /shalat <location>'
   fi
 
   send_message

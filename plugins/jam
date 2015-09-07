@@ -1,26 +1,25 @@
 jam() {
 
- location="${message:5}"
+ local LOCATION="${MESSAGE:4}"
 
- if [[ ${message:4} = *[!\ ]* ]]
- then
-   coords="$(curl -s -g "http://maps.googleapis.com/maps/api/geocode/json?address=${location// /+}")"
-   coords=${coords##*\"location\"}
-   coords=(${coords%%\ \}*})
+ if [[ ${MESSAGE:3} = *[!\ ]* ]]; then
+   local COORDS="$(curl -s -g "http://maps.googleapis.com/maps/api/geocode/json?address=${LOCATION// /+}")"
+   local COORDS=${COORDS##*\"location\"}
+   local COORDS=(${COORDS%%\ \}*})
 
-   time_zone="$(curl -s -g "https://maps.googleapis.com/maps/api/timezone/json?location=${coords[4]}${coords[7]}&timestamp=$(date +%s)")"
-   tz_array=${time_zone##*\"dstOffset\"\ [:]\ }
-   tz_array=${tz_array//,/}
-   tz_array=(${tz_array%%[}]*})
-   tz_name=${time_zone##*\"timeZoneName\"\ [:]\ \"}
-   tz_name=${tz_name%%\"*}
+   local TIME_ZONE="$(curl -s -g "https://maps.googleapis.com/maps/api/timezone/json?location=${COORDS[4]}${COORDS[7]}&timestamp=$(date +%s)")"
+   local TZ_ARRAY=${TIME_ZONE##*\"dstOffset\"\ [:]\ }
+   local TZ_ARRAY=${TZ_ARRAY//,/}
+   local TZ_ARRAY=(${TZ_ARRAY%%[}]*})
+   local TZ_NAME=${TIME_ZONE##*\"timeZoneName\"\ [:]\ \"}
+   local TZ_NAME=${TZ_NAME%%\"*}
 
-   time_utc=$(($(date -u +%s)+${tz_array[0]}+${tz_array[3]}))
+   local TIME_UTC=$(($(date -u +%s)+${TZ_ARRAY[0]}+${TZ_ARRAY[3]}))
 
-   msg="$(printf "%b\n" "$(date -u --date=@${time_utc} "+%T \n%A, %d %B %Y \n${tz_name}")")"
+   msg="$(printf "%b\n" "$(date -u --date=@${TIME_UTC} "+%T \n%A, %d %B %Y \n${TZ_NAME}")")"
  else
-   msg="/jam <location>
-   Sends the time and date for a given location."
+   msg='/jam <location>
+   Sends the time and date for a given location.'
  fi
 
   send_message

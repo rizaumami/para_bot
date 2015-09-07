@@ -1,21 +1,19 @@
 kamus() {
 
-  query="${message:7}"
+  local QUERY="${MESSAGE:6}"
 
-  if [[ ${message:6} = "*[!\ ]*" ]]
-  then
-    definition="$(while read -r line; do [[ $line =~ ^${query,,}[[:cntrl:]] ]] && printf "%b\n" "$line"; done < ./libs/kbbi)"
+  if [[ ${MESSAGE:5} = *[!\ ]* ]]; then
+    local DEFINITION="$(while read -r line; do [[ $line =~ ^${QUERY,,}[[:cntrl:]] ]] && printf "%b\n" "$line"; done < ./libs/kbbi)"
 
-    if [[ -n $definition ]]
-    then
-      msg="$definition"
+    if [[ -n $DEFINITION ]]; then
+      msg="$DEFINITION"
     else
       msg='Maaf, kata yang dicari tidak ada dalam KBBI Edisi III (2005).'
     fi
 
   else
-    msg="/kamus <term>
-    Kamus Besar Bahasa Indonesia, Edisi III (2005)."
+    msg='/kamus <term>
+    Kamus Besar Bahasa Indonesia, Edisi III (2005).'
   fi
 
   send_message

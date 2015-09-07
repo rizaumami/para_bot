@@ -1,13 +1,15 @@
-gema() {
+echo() {
 
- if [[ ${message:5} = "*[!\ ]*" ]]
- then
-   msg="${message:6}"
- else
-   msg="/echo <text>
-   Repeat a string."
- fi
+  if [[ ${MESSAGE%% *} = "echo" ]] ; then
+    if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
+      msg="${MESSAGE:5}"
+    else
+      msg='/echo <text>
+      Repeat a string.'
+    fi
 
-  send_message
+    send_message
+
+  fi
 
 }

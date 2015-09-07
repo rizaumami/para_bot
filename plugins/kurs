@@ -1,18 +1,17 @@
 kurs() {
 
-  req="${message:6}"
+  local REQ="${MESSAGE:5}"
 
-  if [[ ${message:5} = *[!\ ]* ]]
-  then
-    to_curr=${req#*\ }
-    to_curr=${to_curr%\ *}
+  if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
+    local TO_CURR=${REQ#*\ }
+    local TO_CURR=${TO_CURR%\ *}
 
-    g_conv="$(curl -s -X GET "http://www.google.com/finance/converter?from=${req%%\ *}&to=$to_curr&a=${req##*\ }")"
+    local G_CONV="$(curl "http://www.google.com/finance/converter?from=${REQ%%\ *}&to=$TO_CURR&a=${REQ##*\ }")"
 
-    kurs="${g_conv##*'currency_converter_result>'}"
-    kurs="${kurs%%'</span'*}"
+    local KURS="${G_CONV##*'currency_converter_result>'}"
+    local KURS="${KURS%%'</span'*}"
 
-    msg="${kurs//'<span class=bld>'/}"
+    msg="${KURS//'<span class=bld>'/}"
   else
     msg='/kurs <dari> <ke> [besaran]
     Kisaran kurs nilai tukar berdasar Google Finance converter.

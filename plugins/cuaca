@@ -1,28 +1,26 @@
 cuaca() {
 
-  location=${message:7}
+  local LOCATION=${MESSAGE:6}
 
-  if [[ ${message:6} = *[!\ ]* ]]
-  then
-    weather="$(curl "http://api.openweathermap.org/data/2.5/weather?q=${location// /+}&units=metric")"
-    cuaca=${weather##*\"temp\":}
-    cuaca=${cuaca%%,*}
-    country=${weather##*\"country\":\"}
-    country=${country%%\"*}
-    sky_is=${weather##*\"description\":\"}
-    sky_is=${sky_is%%\"*}
-    kota=${weather##*\"name\":\"}
-    kota=${kota%%\"*}
+  if [[ ${MESSAGE:5} = *[!\ ]* ]]; then
+    local WEATHER="$(curl "http://api.openweathermap.org/data/2.5/weather?q=${LOCATION// /+}&units=metric")"
+    local CUACA=${WEATHER##*\"temp\":}
+    local CUACA=${CUACA%%,*}
+    local COUNTRY=${WEATHER##*\"country\":\"}
+    local COUNTRY=${COUNTRY%%\"*}
+    local SKY_IS=${WEATHER##*\"description\":\"}
+    local SKY_IS=${SKY_IS%%\"*}
+    local KOTA=${WEATHER##*\"name\":\"}
+    local KOTA=${KOTA%%\"*}
 
-    if [[ "${kota,,}" =~ "${location,,}" ]]
-    then
-      msg="$(printf "%s\n" "Weather in ${location^}, $country" "$cuaca °C, $sky_is")"
+    if [[ "${KOTA,,}" =~ "${LOCATION,,}" ]]; then
+      msg="$(printf "%s\n" "Weather in ${LOCATION^}, $COUNTRY" "$CUACA °C, $SKY_IS")"
     else
-      msg="Maaf, openweathermap.org tidak memiliki data cuaca ${message:7} terkini."
+      msg="Maaf, openweathermap.org tidak memiliki data cuaca $LOCATION terkini."
     fi
   else
-    msg="/cuaca <location>
-    Returns the current temperature and weather conditions for a specified location."
+    msg='/cuaca <location>
+    Returns the current temperature and weather conditions for a specified location.'
   fi
 
   send_message
