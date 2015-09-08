@@ -73,6 +73,14 @@ while true; do {
     TITLE="${TITLE%%,*}"
     MSG_DATE="${res#*\"date\":}"
     export MSG_DATE="${MSG_DATE%%,*}"
+    FWD_ID="${res##*\"id\":}"
+    FWD_ID="${FWD_ID%%,*}"
+    FWD_FNAME="${res##*\"first_name\":}"
+    FWD_FNAME="${FWD_FNAME%%,*}"
+    FWD_USERNAME="${res##*\"username\":}"
+    FWD_USERNAME="${FWD_USERNAME%%,*}"
+    FWD_DATE="${res##*\"date\":}"
+    FWD_DATE="${FWD_DATE%%,*}"
     MESSAGE="${res##*\"text\":\"\\\/}"
     MESSAGE="${MESSAGE%%\"*}"
     MESSAGE="${MESSAGE/\\/}"
@@ -88,6 +96,10 @@ while true; do {
     MSG_DATE=
     MESSAGE=
     export MSG_DATE=
+    FWD_ID=
+    FWD_FNAME=
+    FWD_USERNAME=
+    FWD_DATE=
   fi
 
   OFFSET="$((OFFSET+1))"
