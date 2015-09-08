@@ -1,12 +1,12 @@
 help() {
 
   local COMMAND="${MESSAGE:5}"
-  local COMMAND=${COMMAND//\//}
+  local COMMAND="${COMMAND//\//}"
 
   if [[ ${MESSAGE:4} = *[!\ ]* &&  -f ./plugins/"${COMMAND}" ]]; then
-    local PLUGS=$(< ./plugins/${COMMAND})
-    local CMD_HELP=${PLUGS##*msg=\'}
-    local CMD_HELP=${CMD_HELP%%\'*}
+    local PLUGS="$(< ./plugins/${COMMAND})"
+    local CMD_HELP="${PLUGS##*msg=\'}"
+    local CMD_HELP="${CMD_HELP%%\'*}"
 
     msg="${CMD_HELP}"
   else

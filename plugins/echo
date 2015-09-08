@@ -1,6 +1,6 @@
 echo() {
 
-  if [[ ${MESSAGE%% *} = "echo" ]] ; then
+  if [[ ${MESSAGE%% *} = "echo" ]]; then
     if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
       msg="${MESSAGE:5}"
     else
@@ -9,7 +9,6 @@ echo() {
     fi
 
     send_message
-
   fi
 
 }

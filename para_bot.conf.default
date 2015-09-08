@@ -1,6 +1,6 @@
-# bot's token here
+# bots token here
 TOKEN=
 
 # bot have no ability to leave a group
 # list allowed group/chat_id into an array
-ALLOWED=()
+ALLOWED=( )

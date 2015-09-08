@@ -16,13 +16,27 @@ SND_MSG=$TG_URL'/sendMessage?chat_id='
 GET_UPD=$TG_URL'/getUpdates?offset='
 BOT_START="$(date +%s)"
 
-for file in ./plugins/* ; do
+for file in ./plugins/*; do
   if [[ -f $file ]]; then
     . $file
   fi
 done
 
 # functions --------------------------------------------------------------------
+
+# check if a value is in the array
+contains() {
+  local n=$#
+  local value=${!n}
+  for ((i=1;i < $#;i++)) {
+    if [[ "${!i}" == "${value}" ]]; then
+      printf "%s\n" "y"
+      return 0
+    fi
+  }
+  printf "%s\n" "n"
+  return 1
+}
 
 send_message() {
   curl --data-urlencode "action=typing" "$TG_URL/sendChatAction?chat_id=$CHAT_ID&"
@@ -31,6 +45,7 @@ send_message() {
 
 # main -------------------------------------------------------------------------
 
+# skip old messages
 OFFSET="$(curl "$GET_UPD")"
 OFFSET="${OFFSET##*update_id\":}"
 OFFSET="${OFFSET%%,*}"
@@ -78,7 +93,7 @@ while true; do {
   OFFSET="$((OFFSET+1))"
 
   if [[ $OFFSET != "1" ]]; then
-    if [[ $CHAT_ID > 0 || $CHAT_ID = "${ALLOWED[@]}" ]] ; then
+    if [[ $CHAT_ID > 0 || $(contains "${A[@]}" "$CHAT_ID") == "y" ]]; then
       if [[ "$(type -t ${MESSAGE%% *})" = "function" ]]; then
         $("${MESSAGE%% *}")
       fi

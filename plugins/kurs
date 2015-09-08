@@ -3,8 +3,8 @@ kurs() {
   local REQ="${MESSAGE:5}"
 
   if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
-    local TO_CURR=${REQ#*\ }
-    local TO_CURR=${TO_CURR%\ *}
+    local TO_CURR="${REQ#*\ }"
+    local TO_CURR="${TO_CURR%\ *}"
 
     local G_CONV="$(curl "http://www.google.com/finance/converter?from=${REQ%%\ *}&to=$TO_CURR&a=${REQ##*\ }")"
 

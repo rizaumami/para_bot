@@ -1,12 +1,12 @@
-# As slow as my internet, at least this is not expensive :D ...
+# As slow as my internet, at least this is not as expensive :D ...
 
 shalat() {
 
   local LOC="${MESSAGE:7}"
 
   if [[ ${MESSAGE:6} = *[!\ ]* ]]; then
-    while read -r line
-      do [[ $line =~ ^"${LOC}," ]] && local LOC= && local LONLATZ=$line
+    while read -r line; do
+      [[ $line =~ ^"${LOC}," ]] && local LOC= && local LONLATZ=$line
     done < ./libs/indo_geoid
 
     local LON="${LONLATZ#*,}"
@@ -17,9 +17,10 @@ shalat() {
 
     if [[ -n $LONLATZ ]]; then
       local SHALAT="$(/usr/bin/python ./libs/praytimes.py ${LON} ${LAT} ${TZ})"
-      msg="$(printf "%b\n" "Waktu shalat di $LOC untuk hari ini adalah:\n\n$SHALAT")"
+      msg="$(printf "%b\n" "Waktu shalat di ${MESSAGE:7} untuk hari ini adalah:\n\n${SHALAT}")"
     else
-      msg="Maaf, waktu shalat untuk $LOC tidak dapat diperhitungkan karena tidak ada dalam database lokasi dan atau bukan merupakan tempat di Indonesia."
+      msg="Maaf, waktu shalat untuk ${LOC} tidak dapat diperhitungkan karena \
+      tidak ada dalam database lokasi dan atau bukan merupakan tempat di Indonesia."
     fi
 
   else

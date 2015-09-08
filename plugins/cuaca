@@ -1,6 +1,6 @@
 cuaca() {
 
-  local LOCATION=${MESSAGE:6}
+  local LOCATION="${MESSAGE:6}"
 
   if [[ ${MESSAGE:5} = *[!\ ]* ]]; then
     local WEATHER="$(curl "http://api.openweathermap.org/data/2.5/weather?q=${LOCATION// /+}&units=metric")"
@@ -16,7 +16,7 @@ cuaca() {
     if [[ "${KOTA,,}" =~ "${LOCATION,,}" ]]; then
       msg="$(printf "%s\n" "Weather in ${LOCATION^}, $COUNTRY" "$CUACA °C, $SKY_IS")"
     else
-      msg="Maaf, openweathermap.org tidak memiliki data cuaca $LOCATION terkini."
+      msg="Maaf, openweathermap.org tidak memiliki data cuaca ${LOCATION} terkini."
     fi
   else
     msg='/cuaca <location>
