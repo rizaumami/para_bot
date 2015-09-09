@@ -17,9 +17,12 @@ help() {
     - /ddg <query>
     - /echo <text>
     - /help [command]
+    - /hex <number>
     - /info
+    - /isup <site>
     - /jam <location>
     - /kamus <term>
+    - /kurs <amount>
     - /shalat <location>'
   fi
 
