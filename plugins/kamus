@@ -12,7 +12,7 @@ kamus() {
     fi
 
   else
-    msg='/kamus <term>
+    msg='/kamus <lema>
     Kamus Besar Bahasa Indonesia, Edisi III (2005).'
   fi
 

@@ -1,0 +1,21 @@
+isup() {
+
+  local SITE="${MESSAGE:5}"
+  local SITE="${SITE//http[s]:\/\//}"
+
+  if [[ ${MESSAGE:3} = *[!\ ]* ]]; then
+    local ISUP="$(curl "http://isup.me/$SITE")"
+
+    if [[ $ISUP =~ "looks down from here" ]]; then
+      msg="It's not just you! ${SITE} looks DOWN from here."
+    else
+      msg="It's just you. ${SITE} is UP."
+    fi
+  else
+    msg='/isup <site>
+    Check if a website or server is up according to isup.me.'
+  fi
+
+  send_message
+
+}
