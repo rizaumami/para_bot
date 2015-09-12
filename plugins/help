@@ -3,14 +3,14 @@ help() {
   local COMMAND="${MESSAGE:5}"
   local COMMAND="${COMMAND//\//}"
 
-  if [[ ${MESSAGE:4} = *[!\ ]* &&  -f ./plugins/"${COMMAND}" ]]; then
+  if [[ ${MESSAGE:4} = *[!\ ]* &&  -e ./plugins/"${COMMAND}" ]]; then
     local PLUGS="$(< ./plugins/${COMMAND})"
-    local CMD_HELP="${PLUGS##*msg=\'}"
+    local CMD_HELP="${PLUGS##*MSG=\'}"
     local CMD_HELP="${CMD_HELP%%\'*}"
 
-    msg="${CMD_HELP}"
+    MSG="${CMD_HELP}"
   else
-    msg='Available commands:
+    MSG='Available commands:
     - /about
     - /calc <expression>
     - /cuaca <location>

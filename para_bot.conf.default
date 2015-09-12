@@ -1,6 +1,10 @@
+# rename this file to para_bot.conf
+
 # bots token here
+# e.g 123456789:abcdefGHIJklmNopqrsTUVWxyz123456789
 TOKEN=
 
 # bot have no ability to leave a group
 # list allowed group/chat_id into an array
+# e.g ( -12345678 - 87654321 )
 ALLOWED=( )

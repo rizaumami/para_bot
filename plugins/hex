@@ -3,12 +3,12 @@ hex() {
   if [[ ${MESSAGE:3} = *[!\ ]* ]]; then
     local HEXDEC="${MESSAGE:4}"
     if [[ ${HEXDEC:0:2} = '0x' ]]; then
-      msg="$(printf '%d\n' "$HEXDEC")"
+      MSG="$(printf '%d\n' "$HEXDEC")"
     else
-      msg="$(printf '0x%x\n' "$HEXDEC")"
+      MSG="$(printf '0x%x\n' "$HEXDEC")"
     fi
   else
-    msg='/hex <number>
+    MSG='/hex <number>
     This function converts a number to or from hexadecimal.'
   fi
 

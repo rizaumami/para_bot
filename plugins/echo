@@ -2,9 +2,9 @@ echo() {
 
   if [[ ${MESSAGE%% *} = "echo" ]]; then
     if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
-      msg="${MESSAGE:5}"
+      MSG="${MESSAGE:5}"
     else
-      msg='/echo <text>
+      MSG='/echo <text>
       Repeat a string.'
     fi
 

@@ -7,9 +7,9 @@ ddg() {
  if [[ ${MESSAGE:3} = *[!\ ]* ]]; then
    local DDGET="$(curl -s -X GET "https://api.duckduckgo.com/?q=%5C$DDG_QUERY&kp=1&format=json&kp=1&no_redirect=1&no_html=1")"
    local DDGET="${DDGET##*Redirect\":\"}"
-   msg="${DDGET%%\",\"DefinitionURL*}"
+   MSG="${DDGET%%\",\"DefinitionURL*}"
  else
-   msg='/ddg <query>
+   MSG='/ddg <query>
    Performs a DuckDuckGo instant search for the given query.'
  fi
 

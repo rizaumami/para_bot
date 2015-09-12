@@ -11,18 +11,19 @@
 
 . para_bot.conf
 
-TG_URL='https://api.telegram.org/bot'$TOKEN
-SND_MSG=$TG_URL'/sendMessage?chat_id='
-GET_UPD=$TG_URL'/getUpdates?offset='
 BOT_START="$(date +%s)"
+WHITELIST=no
 
+# functions --------------------------------------------------------------------
+
+. ./libs/bindings
+
+# load plugins function
 for file in ./plugins/*; do
   if [[ -f $file ]]; then
     . $file
   fi
 done
-
-# functions --------------------------------------------------------------------
 
 # check if a value is in the array
 contains() {
@@ -38,80 +39,37 @@ contains() {
   return 1
 }
 
-send_message() {
-  curl --data-urlencode "action=typing" "$TG_URL/sendChatAction?chat_id=$CHAT_ID&"
-  res=$(curl --data-urlencode "text=$msg" "$SND_MSG$CHAT_ID&reply_to_message_id=$MESSAGE_ID&disable_web_page_preview=1&")
+skip_old_messages() {
+  OFFSET="$(curl "$BASE_URL/getUpdates?timeout=30")"
+  OFFSET="${OFFSET##*update_id\":}"
+  OFFSET="${OFFSET%%,*}"
 }
 
 # main -------------------------------------------------------------------------
 
-# skip old messages
-OFFSET="$(curl "$GET_UPD")"
-OFFSET="${OFFSET##*update_id\":}"
-OFFSET="${OFFSET%%,*}"
+skip_old_messages
 
 while true; do {
 
-  set -f
+  get_updates
 
-  res=$(curl -g "$GET_UPD$OFFSET%26timeout=30")
-
-  if (( ${#res} > 23 )); then
-    OFFSET="${res#*\"update_id\":}"
-    OFFSET="${OFFSET%%,*}"
-    MESSAGE_ID="${res#*\"message_id\":}"
-    MESSAGE_ID="${MESSAGE_ID%%,*}"
-    USER_ID="${res#*\"id\":}"
-    USER_ID="${USER_ID%%,*}"
-    FIRST_NAME="${res#*\"first_name\":}"
-    FIRST_NAME="${FIRST_NAME%%,*}"
-    USERNAME="${res#*\"username\":}"
-    USERNAME="${USERNAME%%,*}"
-    CHAT_ID="${res##*\"chat\":\{\"id\":}"
-    CHAT_ID="${CHAT_ID%%,*}"
-    TITLE="${res#*\"title\":}"
-    TITLE="${TITLE%%,*}"
-    MSG_DATE="${res#*\"date\":}"
-    export MSG_DATE="${MSG_DATE%%,*}"
-    FWD_ID="${res##*\"id\":}"
-    FWD_ID="${FWD_ID%%,*}"
-    FWD_FNAME="${res##*\"first_name\":}"
-    FWD_FNAME="${FWD_FNAME%%,*}"
-    FWD_USERNAME="${res##*\"username\":}"
-    FWD_USERNAME="${FWD_USERNAME%%,*}"
-    FWD_DATE="${res##*\"date\":}"
-    FWD_DATE="${FWD_DATE%%,*}"
-    MESSAGE="${res##*\"text\":\"\\\/}"
-    MESSAGE="${MESSAGE%%\"*}"
-    MESSAGE="${MESSAGE/\\/}"
-    MESSAGE="${MESSAGE/@para_bot/}"
-  else
-    OFFSET=
-    MESSAGE_ID=
-    USER_ID=
-    FIRST_NAME=
-    USERNAME=
-    CHAT_ID=
-    TITLE=
-    MSG_DATE=
-    MESSAGE=
-    export MSG_DATE=
-    FWD_ID=
-    FWD_FNAME=
-    FWD_USERNAME=
-    FWD_DATE=
-  fi
-
+  # go to next message
   OFFSET="$((OFFSET+1))"
 
-  if [[ $OFFSET != "1" ]]; then
-    if [[ $CHAT_ID > 0 || $(contains "${A[@]}" "$CHAT_ID") == "y" ]]; then
-      if [[ "$(type -t ${MESSAGE%% *})" = "function" ]]; then
-        $("${MESSAGE%% *}")
+  if [[ $OFFSET != 1 ]]; then
+    # respond to whitelisted only
+    if [[ $WHITELIST = yes ]]; then
+      if [[ $CHAT_ID > 0 || $(contains "${ALLOWED[@]}" "$CHAT_ID") = "y" ]]; then
+        # check if message is a function
+        if [[ "$(type -t $CMD)" = function ]]; then
+          "$CMD"
+        fi
+      fi
+    elif [[ $WHITELIST = no ]]; then
+      if [[ "$(type -t $CMD)" = function ]]; then
+        "$CMD"
       fi
     fi
   fi
-
-  unset -f
 
 } &>/dev/null; done

@@ -14,12 +14,12 @@ cuaca() {
     local KOTA=${KOTA%%\"*}
 
     if [[ "${KOTA,,}" =~ "${LOCATION,,}" ]]; then
-      msg="$(printf "%s\n" "Weather in ${LOCATION^}, $COUNTRY" "$CUACA °C, $SKY_IS")"
+      MSG="$(printf "%s\n" "Weather in ${LOCATION^}, $COUNTRY" "$CUACA °C, $SKY_IS")"
     else
-      msg="Maaf, openweathermap.org tidak memiliki data cuaca ${LOCATION} terkini."
+      MSG="Maaf, openweathermap.org tidak memiliki data cuaca ${LOCATION} terkini."
     fi
   else
-    msg='/cuaca <location>
+    MSG='/cuaca <location>
     Returns the current temperature and weather conditions for a specified location.'
   fi
 

@@ -1,19 +1,27 @@
 kurs() {
 
   local REQ="${MESSAGE:5}"
+  local REQ=( $REQ )
 
-  if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
-    local TO_CURR="${REQ#*\ }"
-    local TO_CURR="${TO_CURR%\ *}"
+  if [[ ${MESSAGE:4} = *[!\ ]* && (( ${#REQ[@]} > 1 )) ]]; then
 
-    local G_CONV="$(curl "http://www.google.com/finance/converter?from=${REQ%%\ *}&to=$TO_CURR&a=${REQ##*\ }")"
+    local FROM=${REQ[0]}
+    local TO=${REQ[1]}
+    local AMOUNT=${REQ[2]:-1}
+
+    local G_CONV="$(curl "http://www.google.com/finance/converter?from=$FROM&to=$TO&a=$AMOUNT")"
 
     local KURS="${G_CONV##*'currency_converter_result>'}"
     local KURS="${KURS%%'</span'*}"
 
-    msg="${KURS//'<span class=bld>'/}"
+    if [[ ${KURS%% *} = $AMOUNT ]]; then
+      local MSG=${KURS//'<span class=bld>'/}
+    else
+      local MSG="Error"
+    fi
+
   else
-    msg='/kurs <dari> <ke> [besaran]
+    MSG='/kurs <dari> <ke> [besaran]
     Kisaran kurs nilai tukar berdasar Google Finance converter.
     Contoh: /kurs USD IDR 1'
   fi

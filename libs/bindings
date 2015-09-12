@@ -1,0 +1,105 @@
+#!/bin/bash
+
+BASE_URL='https://api.telegram.org/bot'$TOKEN
+
+get_me() {
+
+  RES="$(curl "$BASE_URL/getMe")"
+
+}
+
+get_updates() {
+
+  RES="$(curl -g "$BASE_URL/getUpdates?timeout=30&offset=$OFFSET")"
+
+  if (( ${#RES} > 23 )); then
+    OFFSET="${RES#*\"update_id\":}"
+    OFFSET="${OFFSET%%,*}"
+    MESSAGE_ID="${RES#*\"message_id\":}"
+    MESSAGE_ID="${MESSAGE_ID%%,*}"
+    USER_ID="${RES#*\"id\":}"
+    USER_ID="${USER_ID%%,*}"
+    FIRST_NAME="${RES#*\"first_name\":\"}"
+    FIRST_NAME="${FIRST_NAME%%\"*}"
+    USERNAME="${RES#*\"username\":\"}"
+    USERNAME="${USERNAME%%\"*}"
+    CHAT_ID="${RES##*\"chat\":\{\"id\":}"
+    CHAT_ID="${CHAT_ID%%,*}"
+    TITLE="${RES#*\"title\":\"}"
+    TITLE="${TITLE%%\"*}"
+    MESSAGE_DATE="${RES#*\"date\":}"
+    MESSAGE_DATE="${MESSAGE_DATE%%,*}"
+    FORWARD_FROM_ID="${RES##*\"id\":}"
+    FORWARD_FROM_ID="${FORWARD_FROM_ID%%,*}"
+    FORWARD_FIRST_NAME="${RES##*\"first_name\":\"}"
+    FORWARD_FIRST_NAME="${FORWARD_FIRST_NAME%%\"*}"
+    FORWARD_USERNAME="${RES##*\"username\":\"}"
+    FORWARD_USERNAME="${FORWARD_USERNAME%%\"*}"
+    FORWARD_DATE="${RES##*\"date\":}"
+    FORWARD_DATE="${FORWARD_DATE%%,*}"
+    MESSAGE="${RES##*\"text\":\"\\\/}"
+    MESSAGE="${MESSAGE%%\"*}"
+    MESSAGE="${MESSAGE/\\/}"
+    MESSAGE="${MESSAGE/@para_bot/}"
+    CMD="${MESSAGE%% *}"
+
+    printf "%s\n" '------------------------------------------------------------'
+    printf "%s\n" "offset: $OFFSET"
+    printf "%s\n" "message_id: $MESSAGE_ID"
+    printf "%s\n" "user_id: $USER_ID"
+    printf "%s\n" "first_name: $FIRST_NAME"
+    printf "%s\n" "username: $USERNAME"
+    printf "%s\n" "chat_id: $CHAT_ID"
+    printf "%s\n" "title: $TITLE"
+    printf "%s\n" "message_date: $MESSAGE_DATE"
+    printf "%s\n" "forward_date: $FORWARD_FROM_ID"
+    printf "%s\n" "forward_first_name: $FORWARD_FIRST_NAME"
+    printf "%s\n" "forward_username: $FORWARD_USERNAME"
+    printf "%s\n" "forward_date: $FORWARD_DATE"
+    printf "%s\n" "message: $MESSAGE"
+    printf "%s\n" '------------------------------------------------------------'
+    printf "%s\n" ''
+  else
+    OFFSET=
+    MESSAGE_ID=
+    USER_ID=
+    FIRST_NAME=
+    USERNAME=
+    CHAT_ID=
+    TITLE=
+    MSG_DATE=
+    MESSAGE=
+    MSG_DATE=
+    FWD_ID=
+    FWD_FNAME=
+    FWD_USERNAME=
+    FWD_DATE=
+  fi
+
+}
+
+send_message() {
+
+  send_chat_action
+
+  RES="$(curl --data-urlencode "text=$MSG" "$BASE_URL/sendMessage?chat_id=$CHAT_ID&reply_to_message_id=$MESSAGE_ID&disable_web_page_preview=${disable_web_page_preview:-true}")"
+
+}
+
+send_chat_action() {
+
+  RES="$(curl --data-urlencode "action=${send_chat_action:-typing}" "$BASE_URL/sendChatAction?chat_id=$CHAT_ID")"
+
+}
+
+send_location() {
+
+  RES="$(curl --data-urlencode "text=$MSG" "$BASE_URL/sendLocation?chat_id=$CHAT_ID&latitude=$LAT&longitude=$LON&reply_to_message_id=$MESSAGE_ID")"
+
+}
+
+forward_message() {
+
+  RES="$(curl --data-urlencode "text=$MSG" "$BASE_URL/forwardMessage?chat_id=$CHAT_ID&from_chat_id=$FROM_CHAT_ID&message_id=$MESSAGE_ID")"
+
+}

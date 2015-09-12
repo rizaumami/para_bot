@@ -1,9 +1,9 @@
 info() {
 
  if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
-   msg='This is para_bot, the Telegram bot written in bash.'
+   MSG='This is para_bot, the Telegram bot written in bash.'
  else
-   msg='This is para_bot, the Telegram bot written in bash.'
+   MSG='This is para_bot, the Telegram bot written in bash.'
  fi
 
   send_message

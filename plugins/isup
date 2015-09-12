@@ -1,18 +1,21 @@
 isup() {
 
-  local SITE="${MESSAGE:5}"
-  local SITE="${SITE//http[s]:\/\//}"
-
   if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
+
+    local SITE="${MESSAGE:5}"
+    local SITE=${SITE//\\\/\\\/}
+    local SITE=${SITE//http[s]:\/\/}
     local ISUP="$(curl "http://isup.me/$SITE")"
 
     if [[ $ISUP =~ "looks down from here" ]]; then
-      msg="It's not just you! ${SITE} looks DOWN from here."
+      MSG="It's not just you! ${SITE} looks DOWN from here."
     elif [[ $ISUP =~ "is up" ]]; then
-      msg="It's just you. ${SITE} is UP."
+      MSG="It's just you. ${SITE} is UP."
+    elif [[ $ISUP =~ "look like a site on the interwho" ]]; then
+      MSG="Huh? $SITE doesn't look like a site on the interwho."
     fi
   else
-    msg='/isup <site>
+    MSG='/isup <site>
     Check if a website or server is up according to isup.me.'
   fi
 

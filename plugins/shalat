@@ -17,14 +17,14 @@ shalat() {
 
     if [[ -n $LONLATZ ]]; then
       local SHALAT="$(/usr/bin/python ./libs/praytimes.py ${LON} ${LAT} ${TZ})"
-      msg="$(printf "%b\n" "Waktu shalat di ${MESSAGE:7} untuk hari ini adalah:\n\n${SHALAT}")"
+      MSG="$(printf "%b\n" "Waktu shalat di ${MESSAGE:7} untuk hari ini adalah:\n\n${SHALAT}")"
     else
-      msg="Maaf, waktu shalat untuk ${LOC} tidak dapat diperhitungkan karena \
+      MSG="Maaf, waktu shalat untuk ${LOC} tidak dapat diperhitungkan karena \
       tidak ada dalam database lokasi dan atau bukan merupakan tempat di Indonesia."
     fi
 
   else
-    msg='/shalat <location>
+    MSG='/shalat <location>
     Waktu shalat suatu tempat di Indonesia.'
   fi
 

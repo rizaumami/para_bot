@@ -1,9 +1,9 @@
 calc() {
 
   if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
-    msg="$(printf "%s\n" "scale=2; ${MESSAGE:5}" | bc -l 2>&1)"
+    MSG="$(printf "%s\n" "scale=2; ${MESSAGE:5}" | bc -l 2>&1)"
   else
-    msg='/calc <expression>
+    MSG='/calc <expression>
     Calculator powered by bc, an arbitrary precision calculator language.'
   fi
 
