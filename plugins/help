@@ -26,6 +26,14 @@ help() {
     - /shalat <location>'
   fi
 
-  send_message
+  local RES="$(curl --data-urlencode "text=$MSG" "$BASE_URL/sendMessage?chat_id=$USER_ID")"
+
+  # Unable to PM user who hasn't PM'd first
+  if [[ $RES =~ PEER_ID_INVALID ]]; then
+    send_message
+  else
+    MSG='Saya telah mengirim informasi yang diminta melalui PM.'
+    send_message
+  fi
 
 }

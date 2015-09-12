@@ -1,10 +1,10 @@
 info() {
 
- if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
-   MSG='This is para_bot, the Telegram bot written in bash.'
- else
-   MSG='This is para_bot, the Telegram bot written in bash.'
- fi
+  if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
+    MSG='This is para_bot, the Telegram bot written in bash.'
+  else
+    MSG='This is para_bot, the Telegram bot written in bash.'
+  fi
 
   send_message
 

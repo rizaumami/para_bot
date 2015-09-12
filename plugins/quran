@@ -14,7 +14,6 @@ quran() {
       local SURAT="${QUERY[0]}|${QUERY[1]}|"
 
       local AYAT="$(while read -r line; do [[ $line =~ ^"${SURAT}" ]] && printf "%s\n" "${line##*|}"; done < ./libs/quran)"
-      printf "%s\n" "${AYAT}"
 
       if [[ -n $AYAT ]]; then
         export MSG="$(printf "%s\n" "${AYAT}")"
