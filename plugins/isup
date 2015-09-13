@@ -15,10 +15,18 @@ isup() {
       MSG="Huh? $SITE doesn't look like a site on the interwho."
     fi
   else
-    MSG='/isup <site>
-    Check if a website or server is up according to isup.me.'
+    MSG="$(isup_help)"
   fi
 
   send_message
+
+}
+
+isup_help() {
+
+printf "%s\n" '
+/isup <site>
+Check if a website or server is up according to isup.me
+'
 
 }

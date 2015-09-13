@@ -9,10 +9,18 @@ ddg() {
    local DDGET="${DDGET##*Redirect\":\"}"
    MSG="${DDGET%%\",\"DefinitionURL*}"
  else
-   MSG='/ddg <query>
-   Performs a DuckDuckGo instant search for the given query.'
+   MSG="$(ddg_help)"
  fi
 
   send_message
+
+}
+
+ddg_help() {
+
+printf "%s\n" '
+/ddg <query>
+Performs a DuckDuckGo instant search for the given query.
+'
 
 }

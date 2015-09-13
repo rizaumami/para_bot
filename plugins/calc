@@ -3,10 +3,18 @@ calc() {
   if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
     MSG="$(printf "%s\n" "scale=2; ${MESSAGE:5}" | bc -l 2>&1)"
   else
-    MSG='/calc <expression>
-    Calculator powered by bc, an arbitrary precision calculator language.'
+    MSG="$(calc_help)"
   fi
 
   send_message
+
+}
+
+calc_help() {
+
+printf "%s\n" '
+/calc <expression>
+Calculator powered by bc, an arbitrary precision calculator language.
+'
 
 }

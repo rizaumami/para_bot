@@ -8,10 +8,18 @@ hex() {
       MSG="$(printf '0x%x\n' "$HEXDEC")"
     fi
   else
-    MSG='/hex <number>
-    This function converts a number to or from hexadecimal.'
+    MSG="$(hex_help)"
   fi
 
   send_message
+
+}
+
+hex_help() {
+
+printf "%s\n" '
+/hex <number>
+This function converts a number to or from hexadecimal.
+'
 
 }

@@ -4,26 +4,9 @@ help() {
   local COMMAND="${COMMAND//\//}"
 
   if [[ ${MESSAGE:4} = *[!\ ]* &&  -e ./plugins/"${COMMAND}" ]]; then
-    local PLUGS="$(< ./plugins/${COMMAND})"
-    local CMD_HELP="${PLUGS##*MSG=\'}"
-    local CMD_HELP="${CMD_HELP%%\'*}"
-
-    MSG="${CMD_HELP}"
+    MSG="$(${COMMAND}_help)"
   else
-    MSG='Available commands:
-    - /about
-    - /calc <expression>
-    - /cuaca <location>
-    - /ddg <query>
-    - /echo <text>
-    - /help [command]
-    - /hex <number>
-    - /info
-    - /isup <site>
-    - /jam <location>
-    - /kamus <term>
-    - /kurs <amount>
-    - /shalat <location>'
+    MSG="$(help_help)"
   fi
 
   local RES="$(curl --data-urlencode "text=$MSG" "$BASE_URL/sendMessage?chat_id=$USER_ID")"
@@ -35,5 +18,26 @@ help() {
     MSG='Saya telah mengirim informasi yang diminta melalui PM.'
     send_message
   fi
+
+}
+
+help_help() {
+
+printf "%s\n" '
+Available commands:
+  - /about
+  - /calc <expression>
+  - /cuaca <location>
+  - /ddg <query>
+  - /echo <text>
+  - /help [command]
+  - /hex <number>
+  - /info
+  - /isup <site>
+  - /jam <location>
+  - /kamus <term>
+  - /kurs <amount>
+  - /shalat <location>
+'
 
 }

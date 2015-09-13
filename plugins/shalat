@@ -24,10 +24,18 @@ shalat() {
     fi
 
   else
-    MSG='/shalat <location>
-    Waktu shalat suatu tempat di Indonesia.'
+    MSG="$(shalat_help)"
   fi
 
   send_message
+
+}
+
+shalat_help() {
+
+printf "%s\n" '
+/shalat <location>
+Waktu shalat suatu tempat di Indonesia.
+'
 
 }

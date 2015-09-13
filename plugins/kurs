@@ -21,11 +21,19 @@ kurs() {
     fi
 
   else
-    MSG='/kurs <dari> <ke> [besaran]
-    Kisaran kurs nilai tukar berdasar Google Finance converter.
-    Contoh: /kurs USD IDR 1'
+    MSG="$(kurs_help)"
   fi
 
   send_message
+
+}
+
+kurs_help() {
+
+printf "%s\n" '
+/kurs <dari> <ke> [besaran]
+Kisaran kurs nilai tukar berdasar Google Finance converter.
+Contoh: /kurs USD IDR 1
+'
 
 }

@@ -4,11 +4,19 @@ echo() {
     if [[ ${MESSAGE:4} = *[!\ ]* ]]; then
       MSG="${MESSAGE:5}"
     else
-      MSG='/echo <text>
-      Repeat a string.'
+      MSG="$(echo_help)"
     fi
 
     send_message
   fi
+
+}
+
+echo_help() {
+
+printf "%s\n" '
+/echo <text>
+Repeat a string.
+'
 
 }

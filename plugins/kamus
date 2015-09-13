@@ -12,10 +12,18 @@ kamus() {
     fi
 
   else
-    MSG='/kamus <lema>
-    Kamus Besar Bahasa Indonesia, Edisi III (2005).'
+    MSG="$(kamus_help)"
   fi
 
   send_message
+
+}
+
+kamus_help() {
+
+printf "%s\n" '
+/kamus <lema>
+Kamus Besar Bahasa Indonesia, Edisi III (2005).
+'
 
 }

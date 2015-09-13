@@ -19,10 +19,18 @@ cuaca() {
       MSG="Maaf, openweathermap.org tidak memiliki data cuaca ${LOCATION} terkini."
     fi
   else
-    MSG='/cuaca <location>
-    Returns the current temperature and weather conditions for a specified location.'
+    MSG="$(cuaca_help)"
   fi
 
   send_message
+
+}
+
+cuaca_help() {
+
+printf "%s\n" '
+/cuaca <location>
+Returns the current temperature and weather conditions for a specified location.
+'
 
 }
