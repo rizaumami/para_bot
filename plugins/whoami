@@ -1,0 +1,34 @@
+whoami() {
+
+  if [[ ${MESSAGE:6} = *[!\ ]* ]]; then
+    MSG="$(whoami_help)"
+  else
+    if [[ ${USERNAME} =~ [a-zA-Z0-9_\-] ]]; then
+      local FROM="@${USERNAME}, AKA ${FIRST_NAME}"
+    else
+      local FROM="${FIRST_NAME}"
+    fi
+
+    if [[ ${USER_ID} = ${CHAT_ID} ]]; then
+      local TO="@$BOT_NAME"
+    else
+      local TO="${TITLE}"
+    fi
+
+    MSG="You are ${FROM} (${USER_ID}) and you are messaging ${TO} (${CHAT_ID})."
+  fi
+
+  send_chat_action=typing
+  send_message
+
+}
+
+whoami_help() {
+
+printf "%s\n" '
+/whoami
+Get the user ID for yourself and the group.
+Use it in a reply to get info for the sender of the original message.
+'
+
+}
