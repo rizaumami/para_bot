@@ -1,0 +1,39 @@
+about() {
+
+  if [[ ${MESSAGE:5} = *[!\ ]* ]]; then
+    MSG="$(about_help)"
+  else
+    MSG="$(about_help)"
+  fi
+
+  send_message
+
+}
+
+about_help() {
+
+printf "%s\n" '
+What is @para_bot?
+
+* A Telegram bot written in Bash.
+* Tested with GNU bash, version 4.3.42(1)-release (x86_64-pc-linux-gnu).
+* Require Bash, and written for Bash 4.3 but will probably run on 4.0.
+
+How to create a bot based on @para_bot?
+
+* Register a Telegram bot and auth token from the @BotFather
+* Git clone https://github.com/rizaumami/para_bot
+* Copy para_bot.conf.default to para_bot.conf and add the relevant information.
+* Run: type ./para_bot in terminal
+
+What is plugins?
+
+Plugins is a function. Create a function as your plugin and save it as a file in plugins folder. Function name is the plugin filename.
+
+I'm confussed?
+
+You're welcome.
+Do not private message me for support.
+'
+
+}
