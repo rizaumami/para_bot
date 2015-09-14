@@ -3,11 +3,15 @@ jam() {
  local LOCATION="${MESSAGE:4}"
 
  if [[ ${MESSAGE:3} = *[!\ ]* ]]; then
-   local COORDS="$(curl -s -g "http://maps.googleapis.com/maps/api/geocode/json?address=${LOCATION// /+}")"
+   local COORDS="$(curl -s -g \
+   "http://maps.googleapis.com/maps/api/geocode/json?address=${LOCATION// /+}")"
+
    local COORDS="${COORDS##*\"location\"}"
    local COORDS=( ${COORDS%%\ \}*} )
 
-   local TIME_ZONE="$(curl -s -g "https://maps.googleapis.com/maps/api/timezone/json?location=${COORDS[4]}${COORDS[7]}&timestamp=$(date +%s)")"
+   local TIME_ZONE="$(curl -s -g \
+   "https://maps.googleapis.com/maps/api/timezone/json?location=${COORDS[4]}${COORDS[7]}&timestamp=$(date +%s)")"
+
    local TZ_ARRAY="${TIME_ZONE##*\"dstOffset\"\ [:]\ }"
    local TZ_ARRAY="${TZ_ARRAY//,/}"
    local TZ_ARRAY=( ${TZ_ARRAY%%[}]*} )

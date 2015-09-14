@@ -82,24 +82,31 @@ send_message() {
 
   send_chat_action
 
-  RES="$(curl --data-urlencode "text=$MSG" "$BASE_URL/sendMessage?chat_id=$CHAT_ID&reply_to_message_id=$MESSAGE_ID&disable_web_page_preview=${disable_web_page_preview:-true}")"
+  RES="$(curl --data-urlencode "text=$MSG" \
+  "$BASE_URL/sendMessage?chat_id=$CHAT_ID&reply_to_message_id=$MESSAGE_ID\
+  &disable_web_page_preview=${disable_web_page_preview:-true}")"
 
 }
 
 send_chat_action() {
 
-  RES="$(curl --data-urlencode "action=${send_chat_action:-typing}" "$BASE_URL/sendChatAction?chat_id=$CHAT_ID")"
+  RES="$(curl --data-urlencode "action=${send_chat_action:-typing}" \
+  "$BASE_URL/sendChatAction?chat_id=$CHAT_ID")"
 
 }
 
 send_location() {
 
-  RES="$(curl --data-urlencode "text=$MSG" "$BASE_URL/sendLocation?chat_id=$CHAT_ID&latitude=$LAT&longitude=$LON&reply_to_message_id=$MESSAGE_ID")"
+  RES="$(curl --data-urlencode "text=$MSG" \
+  "$BASE_URL/sendLocation?chat_id=$CHAT_ID&latitude=$LAT&longitude=$LON\
+  &reply_to_message_id=$MESSAGE_ID")"
 
 }
 
 forward_message() {
 
-  RES="$(curl --data-urlencode "text=$MSG" "$BASE_URL/forwardMessage?chat_id=$CHAT_ID&from_chat_id=$FROM_CHAT_ID&message_id=$MESSAGE_ID")"
+  RES="$(curl --data-urlencode "text=$MSG" \
+  "$BASE_URL/forwardMessage?chat_id=$CHAT_ID&from_chat_id=$FROM_CHAT_ID\
+  &message_id=$MESSAGE_ID")"
 
 }

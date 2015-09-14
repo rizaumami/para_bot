@@ -9,21 +9,28 @@
 
 # variables --------------------------------------------------------------------
 
-. para_bot.conf
-
-BOT_START="$(date +%s)"
 WHITELIST=no
 
 # functions --------------------------------------------------------------------
 
-. ./libs/bindings
+bot_init() {
 
-# load plugins function
-for file in ./plugins/*; do
-  if [[ -f $file ]]; then
-    . $file
-  fi
-done
+  BOT_START="$(date +%s)"
+
+  printf "%s\n" "Loading configuration..."
+  . para_bot.conf
+
+  printf "%s\n" "Sourcing API parser..."
+  . ./libs/bindings
+
+  printf "%s\n" "Sourcing plugins..."
+  for file in ./plugins/*; do
+    if [[ -f $file ]]; then
+      . $file
+    fi
+  done
+
+}
 
 # check if a value is in the array
 contains() {
@@ -45,7 +52,18 @@ skip_old_messages() {
   OFFSET="${OFFSET%%,*}"
 }
 
+process_msg() {
+
+# run message if it's a function
+if [[ "$(type -t $CMD)" = function ]]; then
+  "$CMD"
+fi
+
+}
+
 # main -------------------------------------------------------------------------
+
+bot_init
 
 skip_old_messages
 
@@ -60,15 +78,10 @@ while true; do {
     # respond to whitelisted only
     if [[ $WHITELIST = yes ]]; then
       if [[ $CHAT_ID > 0 || $(contains "${ALLOWED[@]}" "$CHAT_ID") = "y" ]]; then
-        # check if message is a function
-        if [[ "$(type -t $CMD)" = function ]]; then
-          "$CMD"
-        fi
+        process_msg
       fi
     elif [[ $WHITELIST = no ]]; then
-      if [[ "$(type -t $CMD)" = function ]]; then
-        "$CMD"
-      fi
+      process_msg
     fi
   fi
 

@@ -28,7 +28,9 @@ How to create a bot based on @para_bot?
 
 What is plugins?
 
-Plugins is a function. Create a function as your plugin and save it as a file in plugins folder. Function name is the plugin filename.
+Plugins is a function.
+Create a function as your plugin and save it as a file in plugins folder.
+Function name is the plugin filename.
 
 I am confussed?
 
